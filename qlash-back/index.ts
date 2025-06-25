@@ -1,12 +1,4 @@
-import express from "express";
+import { initServer } from "./events";
 
-const app = express();
-const port = 8080;
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
-});
-
-app.listen(port, () => {
-    console.log(`Listening on port ${port}...`);
-});
+export const { io } = initServer("localhost", 8000);
