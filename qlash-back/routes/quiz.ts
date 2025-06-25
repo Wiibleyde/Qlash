@@ -6,7 +6,17 @@ const quizRoute: IRoute = {
     register: (app) => {
         app.get('/quiz/:id', (req: Request, res: Response) => {
             const { id } = req.params;
-            res.json({ message: `Details of quiz ${id}` });
+            if (!id) {
+                return res.status(400).json({ message: 'Quiz ID is required' });
+            }
+            QuizService.getQuizById(id)
+                .then(quiz => {
+                    res.status(200).json(quiz);
+                })
+                .catch(error => {
+                    console.error('Error fetching quiz:', error);
+                    res.status(404).json({ message: 'Quiz not found' });
+                });
         });
 
         app.post('/quiz', (req: Request, res: Response) => {
