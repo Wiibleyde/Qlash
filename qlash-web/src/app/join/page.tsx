@@ -2,13 +2,16 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
-import { socket } from '@/utils/socket'
+import { socket } from '@/utils/socket';
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 const Join = () => {
 
   const [username, setUsername] = useState<string>('')
   const [gameCode, setGameCode] = useState<string>('')
+
+  const router = useRouter();
 
   const handleJoinGame = () => {
     socket.emit("join", { username, gameCode });
@@ -18,6 +21,7 @@ const Join = () => {
     socket.on("join", (data) => {
       const { joined, gameCode, gameUuid, message } = data;
       if (joined) {
+        router.push(`/lobby?game=${gameUuid}&code=${gameCode}`);
         console.log(`Joined game with code: ${gameCode} and UUID: ${gameUuid}`);
         // Redirect to game page or update UI accordingly
       } else {

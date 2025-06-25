@@ -1,17 +1,43 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Button from '@/components/Button';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
+import { socket } from '@/utils/socket';
+
+interface SimplePlayer {
+  username: string;
+}
 
 const Lobby = () => {
-  const players = ['Alice', 'Bob', 'Charlie'];
-  const sessionCode = '845923';
-  const sessionLink = `blablaurl${sessionCode}`;
+  const searchParams = useSearchParams();
+  const game = searchParams.get('game');
+  const code = searchParams.get('code');
+
+  const [players, setPlayers] = useState<SimplePlayer[]>([]);
 
   const handleCopyLink = () => {
-    console.log('Copier le lien de la session:', sessionLink);
+    console.log('Copier le lien de la session:', code);
   };
+
+  useEffect(() => {
+    socket.on("synclobby", (data) => {
+      if (!data) return;
+      console.log("Synchronisation des joueurs dans la salle:", data);
+      const { success, players: playersInLobby } = data;
+      if (success) {
+        setPlayers(playersInLobby);
+      } else {
+        toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
+      }
+    })
+    socket.emit("synclobby", { gameUuid: game });
+    return () => {
+      socket.off("synclobby");
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-white flex flex-col">
@@ -28,7 +54,7 @@ const Lobby = () => {
                   onClick={handleCopyLink}
                   title="Cliquez pour copier le lien de la session"
                 >
-                  {sessionCode}
+                  {code}
                 </div>
               </div>
               <Button>🚀 Démarrer la partie</Button>
@@ -42,7 +68,7 @@ const Lobby = () => {
                   key={index}
                   className="bg-blue-100 text-blue-800 font-semibold text-center py-2 rounded-xl shadow"
                 >
-                  {player}
+                  {player.username}
                 </li>
               ))}
             </ul>

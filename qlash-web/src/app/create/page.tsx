@@ -2,16 +2,19 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
-import { socket } from '@/utils/socket'
+import { socket } from '@/utils/socket';
+import { useRouter } from 'next/navigation'
 
 const Join = () => {
 
   const [username, setUsername] = useState<string>('')
 
+  const router = useRouter();
+
   useEffect(() => {
     socket.on("create", (data) => {
       const { gameCode, gameUuid } = data;
-      console.log(`Game created with code: ${gameCode} and UUID: ${gameUuid}`);
+      router.push(`/lobby?game=${gameUuid}&code=${gameCode}`);
     });
     return () => {
       socket.off("create");

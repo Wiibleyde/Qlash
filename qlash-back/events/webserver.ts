@@ -7,6 +7,7 @@ import type { Socket } from 'socket.io';
 import { registerRoutes } from '../routes';
 import create from './create';
 import type { Game } from '../models/Game';
+import synclobby from './synclobby';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -14,7 +15,8 @@ export interface IEvent {
 
 const events: IEvent[] = [
     join,
-    create
+    create,
+    synclobby
 ];
 
 export const games: Game[] = [];
