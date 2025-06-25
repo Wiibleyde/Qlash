@@ -1,11 +1,9 @@
 import type { Express } from 'express';
-import healthRoute from './health';
+import type { IRoute } from '../../qlash-shared/types/socket';
 import authRoute from './auth';
+import healthRoute from './health';
 import quizRoute from './quiz';
 
-export interface IRoute {
-    register: (app: any) => void;
-}
 
 const routes: IRoute[] = [
     healthRoute,

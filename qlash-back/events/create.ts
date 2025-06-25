@@ -1,4 +1,4 @@
-import type { Game, Player } from "../models/Game";
+import type { Game, Player } from "../../qlash-shared/types/game";
 import { createGameCode, createGameUuid } from "../utils/game";
 import { games, type IEvent } from "./webserver";
 

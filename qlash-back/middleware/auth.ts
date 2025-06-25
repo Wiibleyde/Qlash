@@ -1,12 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import type { LoggedUser } from '../../qlash-shared/types/user'; // Adjust the import path as necessary
 
 export interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        name: string;
-    };
+    user?: LoggedUser;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';

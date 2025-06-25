@@ -1,9 +1,9 @@
-import type { IRoute } from "./index";
 import type { Request, Response } from 'express';
-import { QuizService } from "../services/quizService";
+import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import type { Quiz } from "@prisma/client";
-import { prisma } from "../database";
+import { QuizService } from '../services/quizService';
+import { prisma } from '../database';
 
 const quizRoute: IRoute = {
     register: (app) => {

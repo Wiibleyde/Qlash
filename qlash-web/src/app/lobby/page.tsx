@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Button from '@/components/Button';
-import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import Navbar from '@/components/Navbar';
 import { socket } from '@/utils/socket';
-
-interface SimplePlayer {
-  username: string;
-}
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { SimplePlayer } from '../../../../qlash-shared/types/user';
 
 const Lobby = () => {
   const searchParams = useSearchParams();

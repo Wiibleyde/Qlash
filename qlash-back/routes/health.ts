@@ -1,5 +1,5 @@
 import type { Express } from 'express';
-import type { IRoute } from './index';
+import type { IRoute } from '../../qlash-shared/types/socket';
 import { authenticateToken, type AuthenticatedRequest } from '../middleware/auth';
 
 const healthRoute: IRoute = {
