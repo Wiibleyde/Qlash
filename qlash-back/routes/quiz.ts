@@ -13,7 +13,7 @@ const quizRoute: IRoute = {
             res.json({ message: `Details of quiz ${id}` });
         });
 
-        app.post('/quizzes', (req: Request, res: Response) => {
+        app.post('/quiz', (req: Request, res: Response) => {
             const newQuiz = req.body;
             if (!newQuiz || !newQuiz.title || !newQuiz.questions) {
                 return res.status(400).json({ message: 'Invalid quiz data' });
