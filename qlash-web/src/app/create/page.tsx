@@ -31,7 +31,6 @@ const Join = () => {
             <Input
               type='text'
               id='username'
-              className='w-full p-2 border-b border-black placeholder:text-black'
               required
               placeholder='Username'
               value={username}
