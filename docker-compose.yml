@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: RootPassword
+      POSTGRES_DB: qlashdatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./Docker-data/postgres:/var/lib/postgresql/data
