@@ -1,5 +1,5 @@
-import Navbar from "./components/Navbar";
-import TextImageSection from "./components/TextImageSection";
+import Navbar from "../components/Navbar";
+import TextImageSection from "../components/TextImageSection";
 
 export default function Home() {
   return (
