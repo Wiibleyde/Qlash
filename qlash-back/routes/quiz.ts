@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { QuizService } from "../services/quizService";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import type { Quiz } from "@prisma/client";
+import { prisma } from "../database";
 
 const quizRoute: IRoute = {
     register: (app) => {
@@ -19,6 +20,17 @@ const quizRoute: IRoute = {
                     console.error('Error fetching quiz:', error);
                     res.status(404).json({ message: 'Quiz not found' });
                 });
+        });
+
+        app.get('/question/types', async (req: Request, res: Response) => {
+            const quizTypes = await prisma.questionType.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    description: true
+                }
+            });
+            res.status(200).json(quizTypes);
         });
 
         app.post('/quiz', authenticateToken, (req: Request, res: Response) => {
