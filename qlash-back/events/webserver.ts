@@ -4,6 +4,7 @@ import express from 'express';
 import join from './join';
 import type { Socket } from 'socket.io';
 import { registerRoutes } from '../routes';
+import create from './create';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -11,6 +12,7 @@ export interface IEvent {
 
 const events: IEvent[] = [
     join,
+    create
 ];
 
 export const initServer = (host: string, port: number) => {
