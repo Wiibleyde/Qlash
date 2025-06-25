@@ -19,6 +19,7 @@ const join: IEvent = {
             };
             game.players.push(player);
             socket.join(game.id);
+            socket.to(game.id).emit("synclobby");
             socket.emit("join", {
                 joined: true,
                 gameCode: game.code,
