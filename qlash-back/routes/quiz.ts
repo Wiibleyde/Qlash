@@ -4,11 +4,7 @@ import { QuizService } from "../services/quizService";
 
 const quizRoute: IRoute = {
     register: (app) => {
-        app.get('/quizzes', (req: Request, res: Response) => {
-            res.json({ message: 'List of quizzes' });
-        });
-
-        app.get('/quizzes/:id', (req: Request, res: Response) => {
+        app.get('/quiz/:id', (req: Request, res: Response) => {
             const { id } = req.params;
             res.json({ message: `Details of quiz ${id}` });
         });
