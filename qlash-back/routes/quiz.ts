@@ -1,6 +1,8 @@
-import type { IRoute } from ".";
+import type { IRoute } from "./index";
 import type { Request, Response } from 'express';
 import { QuizService } from "../services/quizService";
+import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
+import type { Quiz } from "@prisma/client";
 
 const quizRoute: IRoute = {
     register: (app) => {
@@ -19,13 +21,16 @@ const quizRoute: IRoute = {
                 });
         });
 
-        app.post('/quiz', (req: Request, res: Response) => {
-            const newQuiz = req.body;
-            if (!newQuiz || !newQuiz.title || !newQuiz.questions) {
-                return res.status(400).json({ message: 'Invalid quiz data' });
+        app.post('/quiz', authenticateToken, (req: Request, res: Response) => {
+            const authenticatedReq = req as AuthenticatedRequest;
+
+            if (!authenticatedReq.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
             }
-            // Here you would typically save the quiz to a database
-            QuizService.createQuiz(newQuiz)
+
+            const newQuiz: Omit<Quiz, 'id' | 'createdAt' | 'updatedAt'> = JSON.parse(req.body);
+
+            QuizService.createQuiz(newQuiz, authenticatedReq.user.id)
                 .then(createdQuiz => {
                     res.status(201).json({ message: 'Quiz created', quiz: createdQuiz });
                 })

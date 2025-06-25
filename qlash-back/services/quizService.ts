@@ -21,9 +21,14 @@ export class QuizService {
         return quiz;
     }
 
-    static async createQuiz(data: Quiz) {
+    static async createQuiz(data: Omit<Quiz, 'id' | 'createdAt' | 'updatedAt'>, authorId: string) {
         const quiz = await prisma.quiz.create({
-            data
+            data: {
+                ...data,
+                User: {
+                    connect: { id: authorId }
+                }
+            }
         });
 
         return quiz;
