@@ -1,5 +1,6 @@
 import type { Express } from 'express';
 import type { IRoute } from './index';
+import { authenticateToken, type AuthenticatedRequest } from '../middleware/auth';
 
 const healthRoute: IRoute = {
     register: (app: Express) => {
@@ -12,6 +13,16 @@ const healthRoute: IRoute = {
                 status: 'OK',
                 timestamp: new Date().toISOString(),
                 uptime: process.uptime()
+            });
+        });
+
+        // Route protégée pour vérifier le statut de connexion
+        app.get('/health/account', authenticateToken, (req, res) => {
+            const authenticatedReq = req as AuthenticatedRequest;
+            res.json({
+                status: 'authenticated',
+                user: authenticatedReq.user,
+                timestamp: new Date().toISOString()
             });
         });
     }

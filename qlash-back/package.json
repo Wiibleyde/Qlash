@@ -4,15 +4,19 @@
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bun": "latest",
     "@types/express": "^5.0.3",
-    "@types/bun": "latest"
+    "@types/jsonwebtoken": "^9.0.10"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
+    "bcrypt": "^6.0.0",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^6.10.1",
     "socket.io": "^4.8.1"
   }
