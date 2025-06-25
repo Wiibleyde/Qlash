@@ -3,6 +3,7 @@ import { games, type IEvent } from "./webserver";
 const synclobby: IEvent = {
     register: (socket) => {
         socket.on("synclobby", (data) => {
+            console.log(`User with socket ID ${socket.id} requested to sync lobby., ${JSON.stringify(data)}`);
             const { gameUuid } = data;
             console.log(gameUuid)
             const game = games.find(g => g.id === gameUuid);
@@ -16,9 +17,15 @@ const synclobby: IEvent = {
                 const playersData = game.players.map(player => ({
                     username: player.username,
                 }));
+                console.log(playersData)
+                // l'envoie à tous les joueurs du jeu sauf celui qui a envoyé la requête
                 socket.to(gameUuid).emit("synclobby", {
                     success: true,
                     players: playersData
+                });
+                socket.emit("synclobby", {
+                    success: true,
+                    players: playersData,
                 });
             } else {
                 console.error(`Game with UUID ${gameUuid} not found.`);

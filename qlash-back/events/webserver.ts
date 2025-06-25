@@ -1,12 +1,13 @@
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import express from 'express';
 import cors from 'cors';
-import join from './join';
+import express from 'express';
+import { createServer } from 'http';
 import type { Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import type { Game } from '../../qlash-shared/types/game';
 import { registerRoutes } from '../routes';
 import create from './create';
-import type { Game } from '../models/Game';
+import join from './join';
+import synclobby from './synclobby';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -14,7 +15,8 @@ export interface IEvent {
 
 const events: IEvent[] = [
     join,
-    create
+    create,
+    synclobby
 ];
 
 export const games: Game[] = [];

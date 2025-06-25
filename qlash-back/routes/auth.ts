@@ -1,7 +1,7 @@
-import type { IRoute } from './index';
 import type { Request, Response } from 'express';
-import { UserService } from '../services/userService';
+import type { IRoute } from '../../qlash-shared/types/socket';
 import { generateToken } from '../middleware/auth';
+import { UserService } from '../services/userService';
 
 const authRoute: IRoute = {
     register: (app) => {

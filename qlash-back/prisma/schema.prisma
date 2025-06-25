@@ -27,7 +27,7 @@ model Quiz {
 
 model QuestionType {
   id          String   @id @default(cuid())
-  name        String
+  name        String   @unique
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
