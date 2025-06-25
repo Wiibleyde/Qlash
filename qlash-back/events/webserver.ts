@@ -5,6 +5,7 @@ import join from './join';
 import type { Socket } from 'socket.io';
 import { registerRoutes } from '../routes';
 import create from './create';
+import type { Game } from '../models/Game';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -14,6 +15,8 @@ const events: IEvent[] = [
     join,
     create
 ];
+
+export const games: Game[] = [];
 
 export const initServer = (host: string, port: number) => {
     const app = express();
