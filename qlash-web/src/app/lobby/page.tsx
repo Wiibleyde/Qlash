@@ -19,7 +19,11 @@ const Lobby = () => {
   const [players, setPlayers] = useState<SimplePlayer[]>([]);
 
   const handleCopyLink = () => {
-    console.log('Copier le lien de la session:', code);
+    navigator.clipboard.writeText(code as string).then(() => {
+      toast.success("Code de la session copié dans le presse-papiers !");
+    }).catch((err) => {
+      toast.error("Erreur lors de la copie du code de la session.");
+    });
   };
 
   useEffect(() => {
