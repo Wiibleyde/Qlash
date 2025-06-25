@@ -1,6 +1,7 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import express from 'express';
+import cors from 'cors';
 import join from './join';
 import type { Socket } from 'socket.io';
 import { registerRoutes } from '../routes';
@@ -24,6 +25,12 @@ export const initServer = (host: string, port: number) => {
     // Middleware Express
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cors({
+        origin: '*',
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+    }));
 
     // Register all routes
     registerRoutes(app);

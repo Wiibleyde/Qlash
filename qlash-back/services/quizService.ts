@@ -1,3 +1,4 @@
+import type { Quiz } from "@prisma/client";
 import { prisma } from "../database";
 
 export class QuizService {
@@ -20,7 +21,7 @@ export class QuizService {
         return quiz;
     }
 
-    static async createQuiz(data: any) {
+    static async createQuiz(data: Quiz) {
         const quiz = await prisma.quiz.create({
             data
         });
@@ -28,7 +29,7 @@ export class QuizService {
         return quiz;
     }
 
-    static async updateQuiz(quizId: string, data: any) {
+    static async updateQuiz(quizId: string, data: Quiz) {
         const quiz = await prisma.quiz.update({
             where: { id: quizId },
             data
