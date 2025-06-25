@@ -1,4 +1,4 @@
-import type { IEvent } from ".";
+import type { IEvent } from "./events";
 
 const join: IEvent = {
     register: (socket) => {
