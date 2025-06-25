@@ -1,8 +1,13 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import join from './join';
+import type { Socket } from 'socket.io';
 
-const events = [
+export interface IEvent {
+    register: (socket: Socket) => void;
+}
+
+const events: IEvent[] = [
     join,
 ];
 
@@ -19,7 +24,7 @@ export const initServer = (host: string, port: number) => {
     io.on('connection', (socket) => {
         console.log('A user connected:', socket.id);
 
-        events.forEach(registerEvent => registerEvent(socket));
+        events.forEach(event => event.register(socket));
 
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
