@@ -1,8 +1,16 @@
-import { View, Text, StyleSheet, Animated, Dimensions, ScrollView, TouchableOpacity } from 'react-native'
+import {
+    View,
+    StyleSheet,
+    Animated,
+    Dimensions,
+    ScrollView,
+} from 'react-native';
 import { sliderInformations } from '@/constants/OnBoarding';
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react';
 import Dot from '@/components/onBoarding/Dot';
 import RenderSlide from '@/components/renders/RenderSlider';
+import { router } from 'expo-router';
+import Button from '@/components/ui/Button';
 
 const { width } = Dimensions.get('window');
 
@@ -31,11 +39,17 @@ export default function OnBoarding() {
             sliderInformations.forEach((_, i) => {
                 const dist = Math.abs(position - i);
                 dotAnimations[i].width.setValue(dist < 1 ? 40 - dist * 30 : 10);
-                dotAnimations[i].opacity.setValue(dist < 1 ? 1 - dist * 0.5 : 0.5);
+                dotAnimations[i].opacity.setValue(
+                    dist < 1 ? 1 - dist * 0.5 : 0.5
+                );
             });
 
             const newIndex = Math.round(position);
-            if (newIndex !== currentIndex && newIndex >= 0 && newIndex < sliderInformations.length) {
+            if (
+                newIndex !== currentIndex &&
+                newIndex >= 0 &&
+                newIndex < sliderInformations.length
+            ) {
                 setCurrentIndex(newIndex);
             }
         });
@@ -43,109 +57,87 @@ export default function OnBoarding() {
         return () => scrollX.removeListener(listener);
     }, [currentIndex, dotAnimations, scrollX]);
 
-    const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-        useNativeDriver: false,
-    });
+    const handleScroll = Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        {
+            useNativeDriver: false,
+        }
+    );
 
     const onScrollEnd = (e: any) => {
         const index = Math.round(e.nativeEvent.contentOffset.x / width);
-        if (index >= 0 && index < sliderInformations.length) setCurrentIndex(index);
+        if (index >= 0 && index < sliderInformations.length)
+            setCurrentIndex(index);
     };
 
-  return (
-    <View style={styles.container}>
-        <View style={{ width: '100%', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
-            <ScrollView
-                ref={scrollViewRef}
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                onScroll={handleScroll}
-                scrollEventThrottle={16}
-                onMomentumScrollEnd={onScrollEnd}
-                contentContainerStyle={{ flexGrow: 1 }}
-                decelerationRate="fast"
+    return (
+        <View style={styles.container}>
+            <View
+                style={{
+                    width: '100%',
+                    gap: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
             >
-                {sliderInformations.map((item, i) => (
-                    <RenderSlide key={i} item={item} />
-                ))}
-            </ScrollView>
+                <ScrollView
+                    ref={scrollViewRef}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
+                    onMomentumScrollEnd={onScrollEnd}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    decelerationRate="fast"
+                >
+                    {sliderInformations.map((item, i) => (
+                        <RenderSlide key={i} item={item} />
+                    ))}
+                </ScrollView>
 
-            <View style={styles.paginationContainer}>
-                {sliderInformations.map((_, i) => (
-                    <Dot key={i} index={i} currentIndex={currentIndex} dotAnimations={dotAnimations} />
-                ))}
+                <View style={styles.paginationContainer}>
+                    {sliderInformations.map((_, i) => (
+                        <Dot
+                            key={i}
+                            index={i}
+                            currentIndex={currentIndex}
+                            dotAnimations={dotAnimations}
+                        />
+                    ))}
+                </View>
+                <View style={styles.divider} />
+                <Button
+                    action={() => {
+                        router.push('/signup');
+                    }}
+                    text="GET STARTED"
+                    variants="primary"
+                />
+                <Button
+                    action={() => {
+                        console.log(
+                            'I ALREADY HAVE AN ACCOUNT Pressed Pressed'
+                        );
+                    }}
+                    text="I ALREADY HAVE AN ACCOUNT"
+                    variants="secondary"
+                />
             </View>
-            <View style={styles.divider} />
-            <TouchableOpacity
-                onPress={() => {
-                console.log('Get Started Pressed');
-                }}
-                style={{
-                    backgroundColor: '#694aff',
-                    padding: 20,
-                    borderRadius: 70,
-                    width: '90%',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4.65,
-                    elevation: 8,
-                }}
-            >
-                <Text
-                style={{
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                }}
-                >
-                    GET STARTED
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => {
-                console.log('I ALREADY HAVE AN ACCOUNT Pressed Pressed');
-                }}
-                style={{
-                    backgroundColor: '#f1edff',
-                    padding: 20,
-                    borderRadius: 70,
-                    width: '90%',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4.65,
-                    elevation: 8,
-                }}
-            >
-                <Text
-                style={{
-                    color: '#694aff',
-                    textAlign: 'center',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                }}
-                >
-                    I ALREADY HAVE AN ACCOUNT
-                </Text>
-            </TouchableOpacity>
         </View>
-    </View>
-  )
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  text: {
-    fontSize: 20,
-    color: '#333',
-  },
-  paginationContainer: {
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    text: {
+        fontSize: 20,
+        color: '#333',
+    },
+    paginationContainer: {
         flexDirection: 'row',
         alignSelf: 'center',
         alignItems: 'center',

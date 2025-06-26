@@ -1,0 +1,39 @@
+import { View, Text, TextInput } from 'react-native';
+import React from 'react';
+
+export default function Input({
+    title,
+    placeholder,
+    type,
+}: {
+    title?: string;
+    placeholder?: string;
+    type?: 'emailAddress' | 'password' | 'username';
+}) {
+    return (
+        <View
+            style={{
+                width: '100%',
+                marginVertical: 10,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+            }}
+        >
+            <Text>{title}</Text>
+            <TextInput
+                placeholder={placeholder}
+                style={{
+                    borderColor: '#6200ee',
+                    borderBottomWidth: 1,
+                    marginVertical: 10,
+                    width: '100%',
+                }}
+                textContentType={type}
+                secureTextEntry={type === 'password'}
+                keyboardType={
+                    type === 'emailAddress' ? 'email-address' : 'default'
+                }
+            />
+        </View>
+    );
+}
