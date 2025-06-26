@@ -47,25 +47,26 @@ export const updateBackEnv = (address: string) => {
 
 export const updateEnvVariable = (address: string) => {
     const filesPath = ['../../qlash-mobile/.env', '../../qlash-web/.env'];
-    const envsFilePath = filesPath.map(file => path.resolve(__dirname, file));
-    for (const envFilePath of envsFilePath) {
+    const envVarNames = ['HOST', 'NEXT_PUBLIC_HOST'];
+    for (let i = 0; i < filesPath.length; i++) {
+        const envFilePath = path.resolve(__dirname, filesPath[i] as string);
+        const envVarName = envVarNames[i];
         let envContent = '';
         if (fs.existsSync(envFilePath)) {
             envContent = fs.readFileSync(envFilePath, 'utf8');
-            // Remplace la ligne HOST si elle existe, sinon ajoute-la
-            if (/^HOST=.*/m.test(envContent)) {
-                envContent = envContent.replace(/^HOST=.*/m, `HOST="${address}"`);
+            const regex = new RegExp(`^${envVarName}=.*`, 'm');
+            if (regex.test(envContent)) {
+                envContent = envContent.replace(regex, `${envVarName}="${address}"`);
             } else {
-                envContent += `\nHOST="${address}"\n`;
+                envContent += `\n${envVarName}="${address}"\n`;
             }
         } else {
-            // Crée le fichier avec la ligne HOST si il n'existe pas
-            envContent = `HOST="${address}"\n`;
+            envContent = `${envVarName}="${address}"\n`;
             fs.writeFileSync(envFilePath, envContent, 'utf8');
-            console.log(`Created ${envFilePath} with HOST="${address}"`);
+            console.log(`Created ${envFilePath} with ${envVarName}="${address}"`);
             continue;
         }
         fs.writeFileSync(envFilePath, envContent, 'utf8');
-        console.log(`Updated ${envFilePath} with HOST="${address}"`);
+        console.log(`Updated ${envFilePath} with ${envVarName}="${address}"`);
     }
 }
