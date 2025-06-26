@@ -17,12 +17,12 @@ model Quiz {
   id          String   @id @default(cuid())
   name        String
   description String?
+  authorId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   questions   Question[]
-
-  User User[] @relation("UserQuizzes")
+  author      User     @relation(fields: [authorId], references: [id])
 }
 
 model QuestionType {
@@ -68,5 +68,5 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  quizzes     Quiz[]   @relation("UserQuizzes")
+  quizzes     Quiz[]
 }
