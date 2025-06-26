@@ -8,6 +8,7 @@ import { registerRoutes } from '../routes';
 import create from './create';
 import join from './join';
 import synclobby from './synclobby';
+import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -21,7 +22,14 @@ const events: IEvent[] = [
 
 export const games: Game[] = [];
 
-export const initServer = (host: string, port: number) => {
+export const initServer = (port: number) => {
+
+    const address = getIpAddress();
+    updateBackEnv(address[0] as string);
+    updateEnvVariable(address[0] as string);
+
+    const host = process.env.HOST
+
     const app = express();
 
     // Middleware Express
