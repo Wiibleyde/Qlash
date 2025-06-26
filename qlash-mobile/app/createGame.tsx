@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Input from '@/components/ui/Input';
 import React from 'react';
 import Button from '@/components/ui/Button';
+import { router } from 'expo-router';
 
 export default function createGame() {
     return (
@@ -17,7 +18,13 @@ export default function createGame() {
                 </View>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text="Create" action={() => {}} variants="primary" />
+                <Button
+                    text="Create"
+                    action={() => {
+                        router.push('/hostLobby');
+                    }}
+                    variants="primary"
+                />
             </View>
         </View>
     );
