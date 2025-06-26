@@ -1,15 +1,17 @@
 import { View, Text, TextInput } from 'react-native';
 import React from 'react';
 
+interface InputProps extends React.ComponentProps<typeof TextInput> {
+    title?: string;
+    placeholder?: string;
+    type?: 'emailAddress' | 'password' | 'username';
+}
+
 export default function Input({
     title,
     placeholder,
     type,
-}: {
-    title?: string;
-    placeholder?: string;
-    type?: 'emailAddress' | 'password' | 'username';
-}) {
+}: InputProps) {
     return (
         <View
             style={{

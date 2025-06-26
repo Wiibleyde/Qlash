@@ -47,7 +47,7 @@ export const updateBackEnv = (address: string) => {
 
 export const updateEnvVariable = (address: string) => {
     const filesPath = ['../../qlash-mobile/.env', '../../qlash-web/.env'];
-    const envVarNames = ['HOST', 'NEXT_PUBLIC_HOST'];
+    const envVarNames = ['EXPO_PUBLIC_HOST', 'NEXT_PUBLIC_HOST'];
     for (let i = 0; i < filesPath.length; i++) {
         const envFilePath = path.resolve(__dirname, filesPath[i] as string);
         const envVarName = envVarNames[i];

@@ -1,13 +1,42 @@
 import { View, Text, StyleSheet } from 'react-native';
 import Input from '@/components/ui/Input';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
 import OtpForm from '@/components/ui/OtpForm';
+import { socket } from '@/utils/socket';
+import { router } from 'expo-router';
+import { toast } from 'sonner-native';
 
 export default function JoinGame() {
+
+    const [username, setUsername] = useState<string>('')
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
 
     const gameCode = otp.join('');
+
+    const handleJoinGame = () => {
+        socket.emit("join", { username, gameCode });
+    }
+
+    useEffect(() => {
+        socket.on("join", (data) => {
+            const { joined, gameUuid, message } = data;
+            if (joined) {
+                console.log(`User ${username} joined game with code ${gameCode}`);
+                // router.push(`/lobby?game=${gameUuid}`);
+                console.log(`Joined game with UUID: ${gameUuid}`);
+                // Redirect to game page or update UI accordingly
+            } else {
+                toast.error(`Failed to join game: the information provided is incorrect or the game does not exist.`);
+                console.error(`Failed to join game: ${message}`);
+                // Show error message to user
+            }
+        });
+        return () => {
+            socket.off("join");
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.titleContainer}>
@@ -17,13 +46,15 @@ export default function JoinGame() {
                         title="Username"
                         placeholder="Username"
                         type="username"
+                        value={username}
+                        onChangeText={setUsername}
                     />
                 </View>
                 <OtpForm length={6} otp={otp} setOtp={setOtp} />
                 <View style={styles.buttonContainer}>
                     <Button
                         text="Create"
-                        action={() => {}}
+                        action={handleJoinGame}
                         variants="primary"
                     />
                 </View>
