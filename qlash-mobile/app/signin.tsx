@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Input from '@/components/ui/Input';
 import React from 'react';
 import Button from '@/components/ui/Button';
+import { router } from 'expo-router';
 
 export default function SignUp() {
     return (
@@ -22,7 +23,13 @@ export default function SignUp() {
                 </View>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text="Sign In" action={() => {}} variants="primary" />
+                <Button
+                    text="Sign In"
+                    action={() => {
+                        router.push('/joinGame');
+                    }}
+                    variants="primary"
+                />
             </View>
         </View>
     );
