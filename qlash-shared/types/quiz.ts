@@ -1,4 +1,4 @@
-interface IQuiz {
+export interface IQuiz {
     id: string;
     name: string;
     description: string | null;
@@ -9,7 +9,7 @@ interface IQuiz {
     author?: IUser;
 }
 
-interface IQuestionType {
+export interface IQuestionType {
     id: string;
     name: string;
     description: string | null;
@@ -18,7 +18,7 @@ interface IQuestionType {
     questions?: IQuestion[];
 }
 
-interface IQuestion {
+export interface IQuestion {
     id: string;
     quizId: string;
     typeId: string;
@@ -30,7 +30,7 @@ interface IQuestion {
     options?: IOption[];
 }
 
-interface IOption {
+export interface IOption {
     id: string;
     questionId: string;
     content: string;
@@ -41,7 +41,7 @@ interface IOption {
     question?: IQuestion;
 }
 
-interface IUser {
+export interface IUser {
     id: string;
     email: string;
     password: string;
