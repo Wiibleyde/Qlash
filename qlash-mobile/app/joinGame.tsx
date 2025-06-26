@@ -15,6 +15,7 @@ export default function JoinGame() {
     const gameCode = otp.join('');
 
     const handleJoinGame = () => {
+        console.log(`Joining game with code: ${gameCode} and username: ${username}`);
         socket.emit("join", { username, gameCode });
     }
 
@@ -22,8 +23,7 @@ export default function JoinGame() {
         socket.on("join", (data) => {
             const { joined, gameUuid, message } = data;
             if (joined) {
-                console.log(`User ${username} joined game with code ${gameCode}`);
-                // router.push(`/lobby?game=${gameUuid}`);
+                router.push(`/hostLobby?game=${gameUuid}`);
                 console.log(`Joined game with UUID: ${gameUuid}`);
                 // Redirect to game page or update UI accordingly
             } else {
@@ -45,7 +45,6 @@ export default function JoinGame() {
                     <Input
                         title="Username"
                         placeholder="Username"
-                        type="username"
                         value={username}
                         onChangeText={setUsername}
                     />

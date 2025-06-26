@@ -11,6 +11,7 @@ export default function Input({
     title,
     placeholder,
     type,
+    ...props
 }: InputProps) {
     return (
         <View
@@ -23,6 +24,7 @@ export default function Input({
         >
             <Text>{title}</Text>
             <TextInput
+                {...props}
                 placeholder={placeholder}
                 style={{
                     borderColor: '#6200ee',

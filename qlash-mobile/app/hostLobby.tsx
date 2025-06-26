@@ -1,7 +1,37 @@
 import { View, Text, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { socket } from '@/utils/socket';
+import { SimplePlayer } from '../../qlash-shared/types/user'
+import { toast } from 'sonner-native';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function Hostlobby() {
+    const params = useLocalSearchParams();
+    const game = params.game as string;
+    console.log("Game code:", game);
+
+    const [players, setPlayers] = useState<SimplePlayer[]>([]);
+    const [code, setCode] = useState<string | null>(null);
+
+    useEffect(() => {
+        socket.on("synclobby", (data) => {
+            if (!data) return;
+            console.log("Synchronisation des joueurs dans la salle:", data);
+            const { success, players: playersInLobby, gameCode } = data;
+            console.log("gameCode:", playersInLobby);
+            if (success) {
+                setPlayers(playersInLobby);
+                setCode(gameCode);
+            } else {
+                toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
+            }
+        })
+        socket.emit("synclobby", { gameUuid: game });
+        return () => {
+            socket.off("synclobby");
+        };
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.codeContainer}>
@@ -13,10 +43,12 @@ export default function Hostlobby() {
             <View style={styles.playersContainer}>
                 <Text style={styles.playerTitle}>Players :</Text>
                 <View style={styles.playerContainer}>
-                    <View style={styles.player}>
-                        <Text>Player 1</Text>
-                    </View>
-                </View>
+                    {players.map((player, index) => (
+                        <View key={index} style={styles.player}>
+                            <Text>{player.username}</Text>
+                        </View>
+                    ))}
+                </View>                
             </View>
         </View>
     );
