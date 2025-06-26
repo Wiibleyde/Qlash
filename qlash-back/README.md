@@ -10,6 +10,7 @@ To set the environment variables, create a `.env` file in the root directory wit
 
 ```
 DATABASE_URL="postgresql://root:RootPassword@localhost:5432/qlashdatabase?schema=public"
+JWT_SECRET="your_jwt_secret"
 ```
 
 To run:
