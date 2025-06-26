@@ -4,6 +4,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import { socket } from '@/utils/socket';
 import { useRouter } from 'next/navigation'
+import Navbar from '@/components/Navbar';
 
 const Join = () => {
 
@@ -27,6 +28,7 @@ const Join = () => {
 
   return (
     <div className='bg-white h-screen text-black flex flex-row items-center justify-evenly'>
+      <Navbar />
       <div className='flex flex-col items-center justify-center h-full'>
         <h2 className='text-2xl font-bold mb-6 text-center'>Create</h2>
         <div className='w-96'>
