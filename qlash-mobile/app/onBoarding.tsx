@@ -116,9 +116,7 @@ export default function OnBoarding() {
                 />
                 <Button
                     action={() => {
-                        console.log(
-                            'I ALREADY HAVE AN ACCOUNT Pressed Pressed'
-                        );
+                        router.push('/signin');
                     }}
                     text="I ALREADY HAVE AN ACCOUNT"
                     variants="secondary"
