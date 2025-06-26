@@ -1,15 +1,18 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import Button from '@/components/Button'
-import Input from '@/components/Input'
+import Button from '@/components/Button';
+import Input from '@/components/Input';
+import OtpForm from '@/components/forms/OtpForm';
 import { socket } from '@/utils/socket';
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const Join = () => {
 
   const [username, setUsername] = useState<string>('')
-  const [gameCode, setGameCode] = useState<string>('')
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+
+  const gameCode = otp.join('');
 
   const router = useRouter();
 
@@ -35,6 +38,7 @@ const Join = () => {
     }
   }, []);
 
+
   return (
     <div className='bg-white h-screen text-black flex flex-row items-center justify-evenly'>
       <div className='flex flex-col items-center justify-center h-full'>
@@ -50,16 +54,12 @@ const Join = () => {
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-          <div className='mb-4'>
-            <Input
-              type='text'
-              id='code'
-              required
-              placeholder='Code Pine ta mère'
-              value={gameCode}
-              onChange={(e) => setGameCode(e.target.value)}
-            />
-          </div>
+          <OtpForm
+            otp={otp}
+            setOtp={setOtp}
+            className='mb-4'
+            length={6}
+          />
           <Button onClick={handleJoinGame}>
             Join Game
           </Button>
