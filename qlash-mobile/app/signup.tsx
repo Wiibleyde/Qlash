@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
-import Input from '@/components/ui/signup/Input';
+import Input from '@/components/ui/Input';
 import React from 'react';
 import Button from '@/components/ui/Button';
 
