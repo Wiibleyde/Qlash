@@ -8,7 +8,7 @@ const QuestionFormWrapper: React.FC<Props> = ({ type, onBack, onConfirm }) => {
 
   const renderForm = () => {
     switch (type) {
-      case 'Quiz':
+      case 'Question à choix multiple':
         return <QuizForm onSubmit={handleFormSubmit} />;
     //   case 'Poll':
     //     return <PollForm />;

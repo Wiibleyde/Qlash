@@ -1,28 +1,66 @@
 "use client";
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Button from '@/components/Button';
 import QuestionSelector from '@/components/QuestionSelector';
 import QuestionFormWrapper from '@/components/QuestionFormWrapper';
+import type { IQuiz, IQuestion, IOption } from '../../../../qlash-shared/types/quiz';
+
+const createQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/quiz`;
 
 const allQuestionTypes = [
-  'Quiz',
-  'Checkbox',
-  'True or False',
+  'Question à choix multiple',
+  // 'Checkbox',
+  'Vrai/Faux',
   'Puzzle',
-  'Type Answer',
-  'Quiz + Audio',
-  'Slider',
-  'Say the Word',
-  'Poll',
-  'Drop Pin',
+  // 'Type Answer',
+  // 'Quiz + Audio',
+  // 'Slider',
+  // 'Say the Word',
+  // 'Poll',
+  // 'Drop Pin',
 ];
 
 const LobbyCreate = () => {
+  const searchParams = useSearchParams();
+  const quizId = searchParams.get('quizId');
+  
   const [players] = useState(['Alice', 'Bob', 'Charlie']);
-  const [addedQuestions, setAddedQuestions] = useState<any[]>([]);
+  const [quiz, setQuiz] = useState<Partial<IQuiz>>({
+    name: '',
+    description: '',
+    questions: []
+  });
   const [step, setStep] = useState<'list' | 'choose' | 'form'>('list');
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load existing quiz if quizId is provided
+  useEffect(() => {
+    if (quizId) {
+      loadQuiz(quizId);
+    }
+  }, [quizId]);
+
+  const loadQuiz = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${createQuizApiUrl}/${id}`);
+      if (response.ok) {
+        const loadedQuiz = await response.json();
+        setQuiz(loadedQuiz);
+      } else {
+        console.error('Failed to load quiz');
+        alert('Erreur lors du chargement du quiz');
+      }
+    } catch (error) {
+      console.error('Error loading quiz:', error);
+      alert('Erreur lors du chargement du quiz');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const availableTypes = allQuestionTypes;
 
@@ -31,16 +69,88 @@ const LobbyCreate = () => {
     setStep('form');
   };
 
-  const handleConfirmAdd = (formData: any) => {
-    setAddedQuestions([...addedQuestions, formData]);
+  const handleConfirmAdd = (formData: {
+    type: string;
+    question: string;
+    options?: string[];
+    correctAnswer?: string;
+  }) => {
+    const newQuestion: Omit<IQuestion, 'id' | 'quizId' | 'typeId' | 'createdAt' | 'updatedAt'> = {
+      content: formData.question,
+      type: { 
+        id: '',
+        name: formData.type,
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      options: formData.options?.map((opt, index) => ({
+        id: '',
+        questionId: '',
+        content: opt,
+        isCorrect: opt === formData.correctAnswer,
+        order: index,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }))
+    };
+
+    setQuiz(prev => ({
+      ...prev,
+      questions: [...(prev.questions || []), newQuestion as IQuestion]
+    }));
+    
     setStep('list');
     setSelectedType(null);
-    console.log('Question ajoutée:', addedQuestions);
   };
 
   const handleCancel = () => {
     setStep('list');
     setSelectedType(null);
+  };
+
+  const handleSaveQuiz = async () => {
+    if (!quiz.name || !quiz.questions?.length) {
+      alert('Veuillez ajouter un nom et au moins une question au quiz');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const method = quiz.id ? 'PUT' : 'POST';
+      const url = quiz.id ? `${createQuizApiUrl}/${quiz.id}` : createQuizApiUrl;
+      console.log('Saving quiz:', method, url, quiz);
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(quiz)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Quiz sauvegardé:', result);
+        
+        // Update quiz state with returned data if it's a new quiz
+        if (!quiz.id && result.quiz) {
+          setQuiz(result.quiz);
+        }
+        
+        alert(quiz.id ? 'Quiz mis à jour avec succès!' : 'Quiz créé avec succès!');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la sauvegarde du quiz');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,20 +162,52 @@ const LobbyCreate = () => {
           {step === 'list' && (
             <>
               <div>
-                <h2 className="text-2xl font-extrabold mb-4 text-purple-700">Questions</h2>
-                {addedQuestions.length === 0 ? (
+                <h2 className="text-2xl font-extrabold mb-4 text-purple-700">
+                  {quiz.id ? 'Modifier le Quiz' : 'Créer un Quiz'}
+                </h2>
+                
+                <div className="mb-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Nom du quiz *
+                    </label>
+                    <input
+                      type="text"
+                      value={quiz.name || ''}
+                      onChange={(e) => setQuiz(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Entrez le nom du quiz"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      value={quiz.description || ''}
+                      onChange={(e) => setQuiz(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Description du quiz (optionnel)"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold mb-4 text-purple-700">Questions</h3>
+                {quiz.questions?.length === 0 ? (
                   <p className="text-gray-400 italic">Aucune question ajoutée</p>
                 ) : (
                   <ul className="space-y-2 mb-6">
-                    {addedQuestions.map((q, idx) => (
+                    {quiz.questions?.map((q: IQuestion, idx: number) => (
                       <li key={idx} className="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl shadow space-y-1">
-                        <div><strong>Type:</strong> {q.type}</div>
-                        <div><strong>Question:</strong> {q.question}</div>
+                        <div><strong>Type:</strong> {q.type?.name}</div>
+                        <div><strong>Question:</strong> {q.content}</div>
                         {q.options && (
                           <ul className="pl-4 list-disc">
-                            {q.options.map((opt, i) => (
-                              <li key={i} className={opt === q.correctAnswer ? 'font-bold underline' : ''}>
-                                {opt}
+                            {q.options.map((opt: IOption, i: number) => (
+                              <li key={i} className={opt.isCorrect ? 'font-bold underline' : ''}>
+                                {opt.content}
                               </li>
                             ))}
                           </ul>
@@ -76,8 +218,16 @@ const LobbyCreate = () => {
                 )}
               </div>
 
-              <div className="flex justify-end">
-                <div className="w-1/3">
+              <div className="flex justify-between gap-4">
+                <div className="w-1/2">
+                  <Button 
+                    onClick={handleSaveQuiz} 
+                    disabled={isLoading || !quiz.name || quiz.questions?.length === 0}
+                  >
+                    {isLoading ? '💾 Sauvegarde...' : quiz.id ? '💾 Mettre à jour le quiz' : '💾 Sauvegarder le quiz'}
+                  </Button>
+                </div>
+                <div className="w-1/2">
                   <Button onClick={() => setStep('choose')}>➕ Ajouter une question</Button>
                 </div>
               </div>

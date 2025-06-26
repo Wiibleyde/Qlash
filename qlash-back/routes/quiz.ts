@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
-import type { Quiz } from "@prisma/client";
 import { QuizService } from '../services/quizService';
 import { prisma } from '../database';
 
@@ -40,15 +39,53 @@ const quizRoute: IRoute = {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            const newQuiz: Omit<Quiz, 'id' | 'createdAt' | 'updatedAt'> = JSON.parse(req.body);
+            console.log('Creating quiz for user:', authenticatedReq.user.id);
+            const quizData = req.body;
+            console.log('Quiz data:', JSON.stringify(quizData, null, 2));
 
-            QuizService.createQuiz(newQuiz, authenticatedReq.user.id)
+            QuizService.createQuiz(quizData, authenticatedReq.user.id)
                 .then(createdQuiz => {
                     res.status(201).json({ message: 'Quiz created', quiz: createdQuiz });
                 })
                 .catch(error => {
                     console.error('Error creating quiz:', error);
-                    res.status(500).json({ message: 'Internal server error' });
+                    if (error.message === 'Author not found') {
+                        res.status(400).json({ message: 'Invalid user' });
+                    } else if (error.message.includes('Question type') && error.message.includes('not found')) {
+                        res.status(400).json({ message: error.message });
+                    } else {
+                        res.status(500).json({ message: 'Internal server error' });
+                    }
+                });
+        });
+
+        app.put('/quiz/:id', authenticateToken, (req: Request, res: Response) => {
+            const authenticatedReq = req as AuthenticatedRequest;
+            const { id } = req.params;
+
+            if (!authenticatedReq.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            if (!id) {
+                return res.status(400).json({ message: 'Quiz ID is required' });
+            }
+
+            const updatedQuizData = req.body;
+
+            QuizService.updateQuiz(id, updatedQuizData, authenticatedReq.user.id)
+                .then(quiz => {
+                    res.status(200).json({ message: 'Quiz updated', quiz });
+                })
+                .catch(error => {
+                    console.error('Error updating quiz:', error);
+                    if (error.message === 'Quiz not found' || error.message === 'Unauthorized') {
+                        res.status(404).json({ message: error.message });
+                    } else if (error.message.includes('Question type') && error.message.includes('not found')) {
+                        res.status(400).json({ message: error.message });
+                    } else {
+                        res.status(500).json({ message: 'Internal server error' });
+                    }
                 });
         });
     }
