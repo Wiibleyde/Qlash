@@ -8,7 +8,6 @@ import { useLocalSearchParams } from 'expo-router';
 export default function Hostlobby() {
     const params = useLocalSearchParams();
     const game = params.game as string;
-    console.log("Game code:", game);
 
     const [players, setPlayers] = useState<SimplePlayer[]>([]);
     const [code, setCode] = useState<string | null>(null);
@@ -16,9 +15,7 @@ export default function Hostlobby() {
     useEffect(() => {
         socket.on("synclobby", (data) => {
             if (!data) return;
-            console.log("Synchronisation des joueurs dans la salle:", data);
             const { success, players: playersInLobby, gameCode } = data;
-            console.log("gameCode:", playersInLobby);
             if (success) {
                 setPlayers(playersInLobby);
                 setCode(gameCode);
@@ -37,7 +34,7 @@ export default function Hostlobby() {
             <View style={styles.codeContainer}>
                 <Text style={styles.codeTitle}>Game Code:</Text>
                 <View style={styles.codeTextContainer}>
-                    <Text style={styles.codeText}>123456</Text>
+                    <Text style={styles.codeText}>{code}</Text>
                 </View>
             </View>
             <View style={styles.playersContainer}>
