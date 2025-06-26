@@ -1,5 +1,7 @@
 import QuizForm from "./forms/QuizForm";
 import React from 'react';
+import TrueOrFalseForm from "./forms/TrueFalseForm";
+import PuzzleForm from "./forms/PuzzleForm";
 
 const QuestionFormWrapper: React.FC<Props> = ({ type, onBack, onConfirm }) => {
   const handleFormSubmit = (formData: any) => {
@@ -10,24 +12,10 @@ const QuestionFormWrapper: React.FC<Props> = ({ type, onBack, onConfirm }) => {
     switch (type) {
       case 'Question à choix multiple':
         return <QuizForm onSubmit={handleFormSubmit} />;
-    //   case 'Poll':
-    //     return <PollForm />;
-    //   case 'Say the Word':
-    //     return <SayTheWordForm />;
-    //   case 'Checkbox':
-    //     return <CheckboxForm />;
-    //   case 'Drop Pin':
-    //     return <DropPinForm />;
-    //   case 'Quiz + Audio':
-    //     return <QuizAudioForm />;
-    //   case 'True or False':
-    //     return <TrueFalseForm />;
-    //   case 'Type Answer':
-    //     return <TypeAnswerForm />;
-    //   case 'Slider':
-    //     return <SliderForm />;
-    //   case 'Puzzle':
-    //     return <PuzzleForm />;
+      case 'Vrai/Faux':
+        return <TrueOrFalseForm onSubmit={handleFormSubmit} />;
+      case 'Puzzle':
+        return <PuzzleForm onSubmit={handleFormSubmit} />;
       default:
         return <p className="text-red-500">Type de question inconnu: {type}</p>;
     }

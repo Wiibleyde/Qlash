@@ -22,7 +22,7 @@ const QuizForm: React.FC<Props> = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     onSubmit({
-      type: 'Quiz',
+      type: 'Question à choix multiple',
       question,
       options,
       correctAnswer: options[correctAnswerIndex],
