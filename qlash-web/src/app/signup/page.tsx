@@ -3,11 +3,15 @@ import React, { useState } from 'react';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Navbar from '@/components/Navbar';
+import { useRouter } from 'next/navigation';
 
-const loginUrl = "http://localhost:8000/auth/login";
-const registerUrl = "http://localhost:8000/auth/register";
+const loginUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/auth/login`;
+const registerUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/auth/register`;
 
 const SignUp = () => {
+
+    const router = useRouter();
+
     const [signUpData, setSignUpData] = useState({
         username: '',
         email: '',
@@ -60,6 +64,7 @@ const SignUp = () => {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 // Redirection ou autre action après inscription réussie
+                router.push('/'); // Redirection vers la page d'accueil ou une autre page
                 console.log('Registration successful:', data);
             } else {
                 setError(data.message || 'Registration failed');
@@ -91,6 +96,7 @@ const SignUp = () => {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
+                router.push('/'); // Redirection vers la page d'accueil ou une autre page
                 // Redirection ou autre action après connexion réussie
                 console.log('Login successful:', data);
             } else {
