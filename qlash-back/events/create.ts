@@ -25,7 +25,6 @@ const create: IEvent = {
             game.players.push(player);
             socket.join(gameUuid);
             socket.emit("create", {
-                gameCode,
                 gameUuid
             });
             console.log(`User ${username} created a game with code ${gameCode}`);

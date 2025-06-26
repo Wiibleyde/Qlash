@@ -11,9 +11,9 @@ import { SimplePlayer } from '../../../../qlash-shared/types/user';
 const Lobby = () => {
   const searchParams = useSearchParams();
   const game = searchParams.get('game');
-  const code = searchParams.get('code');
 
   const [players, setPlayers] = useState<SimplePlayer[]>([]);
+  const [code, setCode] = useState<string | null>(null);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(code as string).then(() => {
@@ -27,9 +27,11 @@ const Lobby = () => {
     socket.on("synclobby", (data) => {
       if (!data) return;
       console.log("Synchronisation des joueurs dans la salle:", data);
-      const { success, players: playersInLobby } = data;
+      const { success, players: playersInLobby, gameCode } = data;
+      console.log("gameCode:", gameCode);
       if (success) {
         setPlayers(playersInLobby);
+        setCode(gameCode);
       } else {
         toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
       }

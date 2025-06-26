@@ -22,7 +22,6 @@ const join: IEvent = {
             socket.to(game.id).emit("synclobby");
             socket.emit("join", {
                 joined: true,
-                gameCode: game.code,
                 gameUuid: game.id,
             });
         });

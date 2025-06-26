@@ -21,11 +21,13 @@ const synclobby: IEvent = {
                 // l'envoie à tous les joueurs du jeu sauf celui qui a envoyé la requête
                 socket.to(gameUuid).emit("synclobby", {
                     success: true,
-                    players: playersData
+                    players: playersData,
+                    gameCode: game.code,
                 });
                 socket.emit("synclobby", {
                     success: true,
                     players: playersData,
+                    gameCode: game.code,
                 });
             } else {
                 console.error(`Game with UUID ${gameUuid} not found.`);

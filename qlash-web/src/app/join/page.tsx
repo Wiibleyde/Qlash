@@ -19,10 +19,10 @@ const Join = () => {
 
   useEffect(() => {
     socket.on("join", (data) => {
-      const { joined, gameCode, gameUuid, message } = data;
+      const { joined, gameUuid, message } = data;
       if (joined) {
-        router.push(`/lobby?game=${gameUuid}&code=${gameCode}`);
-        console.log(`Joined game with code: ${gameCode} and UUID: ${gameUuid}`);
+        router.push(`/lobby?game=${gameUuid}`);
+        console.log(`Joined game with UUID: ${gameUuid}`);
         // Redirect to game page or update UI accordingly
       } else {
         toast.error(`Failed to join game: the information provided is incorrect or the game does not exist.`);

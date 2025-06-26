@@ -13,8 +13,8 @@ const Join = () => {
 
   useEffect(() => {
     socket.on("create", (data) => {
-      const { gameCode, gameUuid } = data;
-      router.push(`/lobby?game=${gameUuid}&code=${gameCode}`);
+      const { gameUuid } = data;
+      router.push(`/lobby?game=${gameUuid}`);
     });
     return () => {
       socket.off("create");
