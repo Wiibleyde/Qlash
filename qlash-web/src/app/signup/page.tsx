@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import Navbar from '@/components/Navbar';
 
 const loginUrl = "http://localhost:8000/auth/login";
 const registerUrl = "http://localhost:8000/auth/register";
@@ -104,6 +105,7 @@ const SignUp = () => {
     };
     return (
         <div className='bg-white h-screen text-black flex flex-row items-center justify-evenly'>
+            <Navbar />
             {error && (
                 <div className='fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
                     {error}
