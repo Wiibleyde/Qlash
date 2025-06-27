@@ -15,7 +15,7 @@ const LobbyHost = () => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const res = await fetch('http://10.33.69.135:8000/quizzes/latest');
+        const res = await fetch(`http://${process.env.NEXT_PUBLIC_HOST}:8000/quizzes/latest`);
         const data = await res.json();
         setQuizPresets(data.map((quiz: any) => ({
           id: quiz.id,
