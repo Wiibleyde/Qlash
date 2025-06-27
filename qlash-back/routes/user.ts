@@ -5,7 +5,7 @@ import { UserService } from "../services/userService";
 
 const userRoute: IRoute = {
     register: (app) => {
-        app.get('/user/:id', authenticateToken, (req: Request, res: Response) => {
+        app.get('/user/:id', authenticateToken, async (req: Request, res: Response) => {
             const authenticatedReq = req as AuthenticatedRequest;
             if (!authenticatedReq.user) {
                 return res.status(401).json({ message: 'Unauthorized' });
@@ -17,12 +17,14 @@ const userRoute: IRoute = {
             if (!id) {
                 return res.status(400).json({ message: 'User ID is required' });
             }
-            const user = UserService.getUserById(id);
+            const user = await UserService.getUserById(id)
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
             return res.status(200).json(user);
         });
+
+
 
         app.put('/user/:id', authenticateToken, (req: Request, res: Response) => {
             const authenticatedReq = req as AuthenticatedRequest;
