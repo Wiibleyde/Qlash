@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { socket } from '@/utils/socket';
-import { SimplePlayer } from '../../qlash-shared/types/user'
+import { SimplePlayer } from '../../qlash-shared/types/user';
 import { toast } from 'sonner-native';
 import { useLocalSearchParams } from 'expo-router';
+import Button from '@/components/ui/Button';
 
 export default function Hostlobby() {
     const params = useLocalSearchParams();
@@ -13,40 +14,58 @@ export default function Hostlobby() {
     const [code, setCode] = useState<string | null>(null);
 
     useEffect(() => {
-        socket.on("synclobby", (data) => {
+        socket.on('synclobby', (data) => {
             if (!data) return;
             const { success, players: playersInLobby, gameCode } = data;
             if (success) {
                 setPlayers(playersInLobby);
                 setCode(gameCode);
             } else {
-                toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
+                toast.error(
+                    'Erreur lors de la synchronisation des joueurs dans la salle.'
+                );
             }
-        })
-        socket.emit("synclobby", { gameUuid: game });
+        });
+        socket.emit('synclobby', { gameUuid: game });
         return () => {
-            socket.off("synclobby");
+            socket.off('synclobby');
         };
     }, []);
 
     return (
         <View style={styles.container}>
-            <View style={styles.codeContainer}>
-                <Text style={styles.codeTitle}>Game Code:</Text>
-                <View style={styles.codeTextContainer}>
-                    <Text style={styles.codeText}>{code}</Text>
+            <View style={{ width: '100%', alignItems: 'center' }}>
+                <View style={styles.codeContainer}>
+                    <Text style={styles.codeTitle}>Game Code:</Text>
+                    <View style={styles.codeTextContainer}>
+                        <Text style={styles.codeText}>{code}</Text>
+                    </View>
+                </View>
+                <View style={styles.playersContainer}>
+                    <Text style={styles.playerTitle}>Players :</Text>
+                    <View style={styles.playerContainer}>
+                        {players.map((player, index) => (
+                            <View key={index} style={styles.player}>
+                                <Text style={styles.playerText}>
+                                    {player.username}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+                <View style={styles.quizContainer}>
+                    <Text style={styles.title}>Quiz :</Text>
+                    <View style={styles.selectedQuizContainer}>
+                        <Text style={styles.title}>Quiz Name</Text>
+                    </View>
+                    <Button
+                        action={() => {}}
+                        text="Choose Quiz"
+                        variants="primary"
+                    />
                 </View>
             </View>
-            <View style={styles.playersContainer}>
-                <Text style={styles.playerTitle}>Players :</Text>
-                <View style={styles.playerContainer}>
-                    {players.map((player, index) => (
-                        <View key={index} style={styles.player}>
-                            <Text>{player.username}</Text>
-                        </View>
-                    ))}
-                </View>                
-            </View>
+            <Button action={() => {}} text="Start Game" variants="primary" />
         </View>
     );
 }
@@ -56,8 +75,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
         width: '100%',
+        paddingVertical: 80,
+        justifyContent: 'space-between',
     },
     title: {
         fontWeight: 'bold',
@@ -68,15 +88,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffe020',
         borderRadius: 8,
         alignItems: 'center',
+        width: '100%',
     },
     codeTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    codeText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#000',
+        color: '#694aff',
+    },
+    codeText: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        color: '#694aff',
     },
     codeContainer: {
         alignItems: 'center',
@@ -84,6 +106,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         gap: 10,
         width: '100%',
+        paddingHorizontal: 20,
     },
     playersContainer: {
         width: '100%',
@@ -92,13 +115,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     playerTitle: {
-        fontSize: 18,
+        fontSize: 24,
         fontWeight: 'bold',
+        color: '#694aff',
     },
     player: {
         marginBottom: 10,
         padding: 10,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#dbeafe',
         borderRadius: 8,
         width: '100%',
         justifyContent: 'center',
@@ -109,5 +133,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 20,
+    },
+    playerText: {
+        fontSize: 16,
+        color: '#193ab2',
+    },
+    quizContainer: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 20,
+    },
+    selectedQuizContainer: {
+        width: '90%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 20,
+        borderRadius: 8,
+        backgroundColor: '#f1edff',
+        paddingHorizontal: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 8,
     },
 });

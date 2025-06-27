@@ -5,25 +5,24 @@ import Button from '@/components/ui/Button';
 import { router, useRouter } from 'expo-router';
 import { socket } from '@/utils/socket';
 
-export default function createGame() {
-
-    const [username, setUsername] = useState<string>('')
+export default function CreateGame() {
+    const [username, setUsername] = useState<string>('');
 
     const router = useRouter();
 
     useEffect(() => {
-        socket.on("create", (data) => {
+        socket.on('create', (data) => {
             const { gameUuid } = data;
             router.push(`/hostLobby?game=${gameUuid}`);
         });
         return () => {
-            socket.off("create");
-        }
+            socket.off('create');
+        };
     }, []);
 
     const handleCreateGame = () => {
-        socket.emit("create", { username });
-    }
+        socket.emit('create', { username });
+    };
 
     return (
         <View style={styles.container}>

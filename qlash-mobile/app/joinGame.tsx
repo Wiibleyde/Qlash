@@ -8,33 +8,36 @@ import { router } from 'expo-router';
 import { toast } from 'sonner-native';
 
 export default function JoinGame() {
-
-    const [username, setUsername] = useState<string>('')
+    const [username, setUsername] = useState<string>('');
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
 
     const gameCode = otp.join('');
 
     const handleJoinGame = () => {
-        console.log(`Joining game with code: ${gameCode} and username: ${username}`);
-        socket.emit("join", { username, gameCode });
-    }
+        console.log(
+            `Joining game with code: ${gameCode} and username: ${username}`
+        );
+        socket.emit('join', { username, gameCode });
+    };
 
     useEffect(() => {
-        socket.on("join", (data) => {
+        socket.on('join', (data) => {
             const { joined, gameUuid, message } = data;
             if (joined) {
                 router.push(`/hostLobby?game=${gameUuid}`);
                 console.log(`Joined game with UUID: ${gameUuid}`);
                 // Redirect to game page or update UI accordingly
             } else {
-                toast.error(`Failed to join game: the information provided is incorrect or the game does not exist.`);
+                toast.error(
+                    `Failed to join game: the information provided is incorrect or the game does not exist.`
+                );
                 console.error(`Failed to join game: ${message}`);
                 // Show error message to user
             }
         });
         return () => {
-            socket.off("join");
-        }
+            socket.off('join');
+        };
     }, []);
 
     return (
