@@ -162,8 +162,14 @@ export class QuizService {
             },
             take: 10,
             include: {
-                author: true
-            }
+                author: true,
+                questions: {
+                    include: {
+                        type: true,
+                        options: true
+                    }
+                }
+            },
         });
         return quizzes;
     }
@@ -177,7 +183,13 @@ export class QuizService {
                 }
             },
             include: {
-                author: true
+                author: true,
+                questions: {
+                    include: {
+                        type: true,
+                        options: true
+                    }
+                }
             }
         });
         return quizzes;
