@@ -9,6 +9,7 @@ import create from './create';
 import join from './join';
 import synclobby from './synclobby';
 import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config';
+import startgame from './startgame';
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -17,7 +18,8 @@ export interface IEvent {
 const events: IEvent[] = [
     join,
     create,
-    synclobby
+    synclobby,
+    startgame
 ];
 
 export const games: Game[] = [];

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import Navbar from '@/components/Navbar';
@@ -11,13 +11,15 @@ import { socket } from '@/utils/socket';
 import { SimplePlayer } from '../../../../qlash-shared/types/user';
 
 const Lobby = () => {
+
+  const router = useRouter();
   const searchParams = useSearchParams();
   const game = searchParams.get('game');
 
   const [players, setPlayers] = useState<SimplePlayer[]>([]);
   const [code, setCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState<boolean>(false);
-  
+
   const [selectedPresets, setSelectedPresets] = useState<string[]>([]);
   const [selectingPreset, setSelectingPreset] = useState(false);
 
@@ -33,18 +35,30 @@ const Lobby = () => {
     });
   };
 
+  const handleStartGame = () => {
+    socket.emit("startgame", { gameUuid: game, selectedQuiz: quizPresets[0] });
+  }
+
   useEffect(() => {
     socket.on("synclobby", (data) => {
       if (!data) return;
-
       const { success, players: playersInLobby, gameCode } = data;
-
       if (success) {
         setIsHost(playersInLobby.some((player: SimplePlayer) => player.socketId === socket.id && player.isHost));
         setPlayers(playersInLobby);
         setCode(gameCode);
       } else {
         toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
+      }
+    });
+
+    socket.on("startgame", (data) => {
+      const { success, message, gameId } = data;
+      if (success) {
+        toast.success(message);
+        router.push(`/game?game=${gameId}`);
+      } else {
+        toast.error(message);
       }
     });
 
@@ -168,7 +182,9 @@ const Lobby = () => {
               </div>
             </div>
 
-            <Button>🚀 Démarrer la partie</Button>
+            <Button onClick={handleStartGame}>
+              🚀 Démarrer la partie
+            </Button>
           </div>
         </div>
       ) : (
