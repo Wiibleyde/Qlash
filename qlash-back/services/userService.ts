@@ -66,4 +66,35 @@ export class UserService {
         const { password: _, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
+
+    static  async updateUser(id: string, data: Partial<{ email: string; name: string; password: string }>) {
+        // Vérifier si l'utilisateur existe
+        const user = await prisma.user.findUnique({
+            where: { id }
+        });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Si le mot de passe est fourni, le hasher
+        let hashedPassword;
+        if (data.password) {
+            const saltRounds = 10;
+            hashedPassword = await bcrypt.hash(data.password, saltRounds);
+        }
+
+        // Mettre à jour l'utilisateur
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: {
+                email: data.email || user.email,
+                name: data.name || user.name,
+                password: hashedPassword || user.password
+            }
+        });
+
+        const { password: _, ...userWithoutPassword } = updatedUser;
+        return userWithoutPassword;
+    }
 }
