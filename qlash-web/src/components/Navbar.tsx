@@ -9,8 +9,36 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    async function checkLoginStatus() {
+      const token = localStorage.getItem('token');
+      // If you don't need the fetch, you can remove it or handle it as needed
+      const response = await fetch(`http://${process.env.NEXT_PUBLIC_HOST}:8000/auth/isAuthenticated`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        method: 'GET',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'authenticated') {
+          const user = localStorage.getItem('user');
+          if (user) {
+            const parsedUser = JSON.parse(user);
+            setIsLoggedIn(!!parsedUser);
+          }
+        } else {
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+      // If you want to handle the case where the user is not logged in
+      if (!token) {
+        setIsLoggedIn(false);
+      }
+    }
+    checkLoginStatus();
   }, []);
 
   const handleLogout = () => {

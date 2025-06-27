@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { IRoute } from '../../qlash-shared/types/socket';
-import { generateToken } from '../middleware/auth';
+import { authenticateToken, generateToken, type AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
 
 const authRoute: IRoute = {
@@ -82,6 +82,18 @@ const authRoute: IRoute = {
         // Route de déconnexion (côté client, juste supprimer le token)
         app.post('/auth/logout', (req: Request, res: Response) => {
             res.json({ message: 'Logout successful' });
+        });
+
+        app.get('/auth/isAuthenticated', authenticateToken, (req: Request, res: Response) => {
+            const authenticatedReq = req as AuthenticatedRequest; // Cast to any to access user property
+            if (!authenticatedReq.user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+            res.json({
+                status: 'authenticated',
+                user: authenticatedReq.user,
+                timestamp: new Date().toISOString()
+            });
         });
     }
 };
