@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import QCMAnswerGrid from "@/components/grid/QCMAnswerGrid";
 import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
 import { socket } from "@/utils/socket";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type QuestionType = "QCM" | "Vrai/Faux" | "Classement";
 
@@ -12,6 +12,7 @@ interface QCMAnswerOption {
 }
 
 const GameQuestion = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const game = searchParams.get('game');
   const [timer, setTimer] = useState(30);
@@ -33,18 +34,18 @@ const GameQuestion = () => {
   const questionData = {
     QCM: {
       question: "Quelle est la capitale de la France ?",
-      answers: [
-        { text: "Paris", color: "bg-red-500" },
-        { text: "Lyon", color: "bg-blue-500" },
-        { text: "Marseille", color: "bg-yellow-400" },
-        { text: "Nice", color: "bg-green-500" },
+      colors: [
+        "bg-red-500",
+        "bg-blue-500",
+        "bg-yellow-400",
+        "bg-green-500",
       ],
     },
     "Vrai/Faux": {
       question: "La Terre est plate.",
-      answers: [
-        { text: "Vrai", color: "bg-green-500" },
-        { text: "Faux", color: "bg-red-500" },
+      colors: [
+        "bg-green-500",
+        "bg-red-500",
       ],
     },
     Classement: {
@@ -68,8 +69,8 @@ const GameQuestion = () => {
       setWaiting(false);
     });
     socket.on("game:wait", () => setWaiting(true));
-    socket.on("game:end", ({ scores }) => {
-      setGameEnded(true);
+    socket.on("game:end", () => {
+      router.push(`/scoreboard?game=${game}`);
     });
     return () => {
       socket.off("game:question");

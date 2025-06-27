@@ -16,8 +16,11 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
     console.log(game)
     const question = game.quiz?.questions?.[index];
     const answers = question?.options
+
     if (!question) {
-        console.error(`Question not found for game ${gameUuid} at index ${index}.`);
+        console.error(`End of quiz reached for game ${gameUuid}.`);
+        socket.to(gameUuid).emit("game:end", {});
+        socket.emit("game:end", {});
         return;
     }
     game.players.forEach((player) => {
@@ -59,6 +62,7 @@ const gameEvent: IEvent = {
         });
         socket.on("game:answer", (data) => {
             const { gameUuid, answer } = data;
+            console.log("answer", data);
             const game = games.find((g: Game) => g.id === gameUuid);
             if (!game) {
                 console.error(`Game with UUID ${gameUuid} not found.`);
