@@ -1,24 +1,41 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import React from 'react';
 
+const getButtonStyle = (variants: string) => {
+    switch (variants) {
+        case 'primary':
+            return styles.buttonPrimary;
+        case 'secondary':
+            return styles.buttonSecondary;
+        case 'primaryDisabled':
+            return styles.buttonPrimaryDisabled;
+        case 'secondaryDisabled':
+            return styles.buttonSecondaryDisabled;
+        default:
+            return styles.buttonPrimary; // Default to primary if no variant is provided
+    }
+};
+
 export default function Button({
     action,
     text,
     variants,
+    disabled = false,
 }: {
     action?: () => void;
     text?: string;
-    variants?: 'primary' | 'secondary';
+    variants?:
+        | 'primary'
+        | 'secondary'
+        | 'primaryDisabled'
+        | 'secondaryDisabled';
+    disabled?: boolean;
 }) {
     return (
         <TouchableOpacity
             onPress={action}
-            style={[
-                styles.button,
-                variants === 'primary'
-                    ? styles.buttonPrimary
-                    : styles.buttonSecondary,
-            ]}
+            style={[styles.button, getButtonStyle(variants || 'primary')]}
+            disabled={disabled}
         >
             <Text
                 style={[
@@ -61,5 +78,17 @@ const styles = StyleSheet.create({
     },
     buttonSecondaryText: {
         color: '#694aff',
+    },
+    buttonPrimaryDisabled: {
+        backgroundColor: '#d3d3d3',
+    },
+    buttonSecondaryDisabled: {
+        backgroundColor: '#f1edff',
+    },
+    buttonPrimaryTextDisabled: {
+        color: '#a9a9a9',
+    },
+    buttonSecondaryTextDisabled: {
+        color: '#d3d3d3',
     },
 });

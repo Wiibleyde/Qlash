@@ -1,9 +1,23 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AnswerButton from '@/components/ui/AnswerButton';
+import Button from '@/components/ui/Button';
+
+const getContainerStyle = (bool: true | false) => {
+    switch (bool) {
+        case false:
+            return styles.container;
+        case true:
+            return styles.secondaryContainer;
+        default:
+            return styles.container;
+    }
+};
 
 export default function Game() {
     const [timer, setTimer] = useState(30);
+    const [answersSelectedBool, setAnswersSelectedBool] = useState(false);
+    const [waitingForPlayers, setWaitingForPlayers] = useState(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -13,7 +27,7 @@ export default function Game() {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <View style={getContainerStyle(answersSelectedBool)}>
             <View style={{ width: '100%', alignItems: 'center' }}>
                 <View style={styles.infoContainer}>
                     <View style={styles.questionNumberContainer}>
@@ -29,24 +43,61 @@ export default function Game() {
                     </Text>
                 </View>
             </View>
-            <View style={styles.answerButtonsContainer}>
-                <AnswerButton action={() => {}} text="Answer 1" variant="red" />
-                <AnswerButton
-                    action={() => {}}
-                    text="Answer 2"
-                    variant="blue"
-                />
-                <AnswerButton
-                    action={() => {}}
-                    text="Answer 3"
-                    variant="yellow"
-                />
-                <AnswerButton
-                    action={() => {}}
-                    text="Answer 4"
-                    variant="green"
-                />
-            </View>
+            {!answersSelectedBool ? (
+                <View style={styles.answerButtonsContainer}>
+                    <AnswerButton
+                        action={() => {
+                            setAnswersSelectedBool(true);
+                        }}
+                        text="Answer 1"
+                        variant="red"
+                    />
+                    <AnswerButton
+                        action={() => {
+                            setAnswersSelectedBool(true);
+                        }}
+                        text="Answer 2"
+                        variant="blue"
+                    />
+                    <AnswerButton
+                        action={() => {
+                            setAnswersSelectedBool(true);
+                        }}
+                        text="Answer 3"
+                        variant="yellow"
+                    />
+                    <AnswerButton
+                        action={() => {
+                            setAnswersSelectedBool(true);
+                        }}
+                        text="Answer 4"
+                        variant="green"
+                    />
+                </View>
+            ) : waitingForPlayers ? (
+                <View style={styles.answerButtonsContainer}>
+                    <Button
+                        action={() => {
+                            setAnswersSelectedBool(false);
+                            setTimer(30);
+                        }}
+                        text="Waiting for other players..."
+                        variants="primaryDisabled"
+                        disabled={true}
+                    />
+                </View>
+            ) : (
+                <View style={styles.answerButtonsContainer}>
+                    <Button
+                        action={() => {
+                            setAnswersSelectedBool(false);
+                            setTimer(30);
+                        }}
+                        text="Next Question"
+                        variants="primary"
+                    />
+                </View>
+            )}
         </View>
     );
 }
@@ -57,6 +108,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'space-around',
+    },
+    secondaryContainer: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 85,
     },
     title: {
         fontSize: 24,
@@ -133,5 +191,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '90%',
         marginBottom: 20,
+    },
+    waitingText: {
+        fontSize: 16,
+        color: '#333',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        width: '100%',
     },
 });
