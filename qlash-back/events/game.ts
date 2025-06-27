@@ -13,6 +13,7 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
         return;
     }
     const index = game.currentQuestionIndex;
+    game.currentQuestionStartTime = Date.now();
     console.log(game)
     const question = game.quiz?.questions?.[index];
     const answers = question?.options
@@ -77,6 +78,38 @@ const gameEvent: IEvent = {
                 console.error(`Player with ID ${socket.id} not found in game ${gameUuid}.`);
                 return;
             }
+            if (player.isAnswered) {
+                console.warn(`Player ${player.username} has already answered.`);
+                return;
+            }
+
+            const question = game.quiz?.questions?.[game.currentQuestionIndex];
+            if (!question) {
+                console.error(`No question found for game ${gameUuid} at index ${game.currentQuestionIndex}.`);
+                return;
+            }
+
+            console.log(answer)
+
+            const currentQuestionOptions = question.options || [];
+            const userAnswer = currentQuestionOptions[answer];
+            const correctAnswers = currentQuestionOptions.filter((option) => option.isCorrect).map((option) => option.id);
+
+            if (!userAnswer) {
+                console.error(`Invalid answer index ${answer} for question in game ${gameUuid}.`);
+                return;
+            }
+            if (correctAnswers.includes(userAnswer.id)) {
+                // Player answered correctly 
+                const timeTaken = (Date.now() - game.currentQuestionStartTime!) / 1000; // Convert to seconds
+                // Calculate score: 1000 points max, decreasing proportionally with time
+                const score = Math.max(0, Math.floor(1000 * (TIMER - timeTaken) / TIMER));
+                player.score += score;
+                console.log(`Player ${player.username} answered correctly! Score: ${player.score}, Time taken: ${timeTaken}s`);
+            } else {
+                console.log(`Player ${player.username} answered incorrectly. Score: ${player.score}`);
+            }
+
             player.isAnswered = true;
             socket.emit("game:answer", {});
         });
