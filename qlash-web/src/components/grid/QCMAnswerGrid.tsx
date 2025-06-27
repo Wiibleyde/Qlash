@@ -2,32 +2,31 @@
 import React from "react";
 
 interface QCMAnswerOption {
-  text: string;
-  color: string;
+  content: string;
 }
 
 interface QCMAnswerGridProps {
   answers: QCMAnswerOption[];
   selectedIdx: number | null;
-  onSelect: (idx: number) => void;
+  handleAnswer: (answer: number) => void;
 }
 
 const QCMAnswerGrid: React.FC<QCMAnswerGridProps> = ({
   answers,
   selectedIdx,
-  onSelect,
+  handleAnswer,
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-4xl">
       {answers.map((ans, idx) => (
         <button
           key={idx}
-          onClick={() => onSelect(idx)}
-          className={`text-2xl font-bold ${ans.color} text-white rounded-lg py-6 px-4 shadow-xl hover:scale-105 transition-transform duration-300
+          onClick={() => handleAnswer(idx)}
+          className={`text-2xl font-bold text-black rounded-lg py-6 px-4 shadow-xl hover:scale-105 transition-transform duration-300
             ${selectedIdx === idx ? "ring-4 ring-white scale-105" : ""}
           `}
         >
-          {ans.text}
+          {ans.content}
         </button>
       ))}
     </div>

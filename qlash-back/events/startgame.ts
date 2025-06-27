@@ -1,10 +1,12 @@
 import { QuizService } from "../services/quizService";
+import { sendQuestion } from "./game";
 import { games, type IEvent } from "./webserver";
 
 const startgame: IEvent = {
     register: (socket) => {
-        socket.on("startgame", (data) => {
+        socket.on("startgame", async (data) => {
             const { gameUuid, selectedQuiz } = data;
+            console.log("Selected quiz:", selectedQuiz);
             const isHost = games.some(game =>
                 game.id === gameUuid && game.players.some(player => player.socketId === socket.id && player.isHost)
             );
@@ -25,13 +27,14 @@ const startgame: IEvent = {
                 return;
             }
             try {
-                const quizz = QuizService.getQuizById(selectedQuiz.id);
+                const quizz = await QuizService.getQuizById(selectedQuiz.id);
                 if (!quizz) {
                     console.error(`Quiz with ID ${selectedQuiz.id} not found.`);
                     socket.emit("startgame", { success: false, message: "Quiz not found." });
                     return;
                 }
-                game.quiz = selectedQuiz;
+                console.log("Quizz from service:", quizz);
+                game.quiz = quizz;
             } catch (error) {
                 console.error(`Error fetching quiz with ID ${selectedQuiz.id}:`, error);
                 socket.emit("startgame", { success: false, message: "Error fetching quiz." });
@@ -47,6 +50,10 @@ const startgame: IEvent = {
                 message: "Game is starting.",
                 gameId: game.id
             });
+
+            setTimeout(() => {
+                sendQuestion(gameUuid, socket);
+            }, 2000);
         });
     },
 };
