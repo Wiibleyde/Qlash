@@ -29,7 +29,6 @@ const LobbyCreate = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load existing quiz if quizId is provided
   useEffect(() => {
     if (quizId) {
       loadQuiz(quizId);
@@ -128,7 +127,6 @@ const LobbyCreate = () => {
         const result = await response.json();
         console.log('Quiz sauvegardé:', result);
         
-        // Update quiz state with returned data if it's a new quiz
         if (!quiz.id && result.quiz) {
           setQuiz(result.quiz);
         }
@@ -260,33 +258,6 @@ const LobbyCreate = () => {
               </div>
             </>
           )}
-        </div>
-
-        <div className="w-80 flex flex-col justify-between bg-white text-black rounded-3xl p-6 shadow-2xl">
-          <div>
-            <div className="mb-6 text-center">
-              <h3 className="text-xl font-bold text-purple-600 mb-2">Code de session</h3>
-              <div className="bg-yellow-300 text-purple-800 text-3xl font-extrabold px-6 py-4 rounded-2xl shadow-md tracking-widest">
-                845923
-              </div>
-            </div>
-
-            <h3 className="text-xl font-bold text-purple-600 mb-3">Joueurs</h3>
-            <div className="max-h-48 overflow-y-auto pr-2">
-              <ul className="space-y-2">
-                {players.map((player, index) => (
-                  <li
-                    key={index}
-                    className="bg-blue-100 text-blue-800 font-semibold text-center py-2 rounded-xl shadow"
-                  >
-                    {player}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <Button>🚀 Démarrer la partie</Button>
         </div>
       </div>
     </div>

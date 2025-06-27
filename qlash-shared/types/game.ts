@@ -7,6 +7,7 @@ export interface Game {
     host: Player;
     quiz?: IQuiz;
     currentQuestionIndex: number;
+    currentQuestionStartTime?: number;
 }
 
 

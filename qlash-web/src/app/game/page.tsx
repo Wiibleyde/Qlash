@@ -23,6 +23,8 @@ const GameQuestion = () => {
   const [answers, setAnswers] = useState<QCMAnswerOption[]>([]);
   const [waiting, setWaiting] = useState<boolean>(true);
   const [gameEnded, setGameEnded] = useState<boolean>(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [quizLength, setQuizLength] = useState<number>(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,8 +63,8 @@ const GameQuestion = () => {
   }, [questionType]);
 
   useEffect(() => {
-    socket.on("game:question", ({ question, timer, questionIndex, answer, type }) => {
-      console.log("Received question:", question, "with timer:", timer, "for question index:", questionIndex, "and answer:", answer, "type:", question.type.name);
+    socket.on("game:question", ({ question, timer, questionIndex, answer, type, currentIndex, quizLength }) => {
+      console.log("Received question:", currentIndex, quizLength);
       setAnswers(question.options || []);
       setQuestion(question.content || "");
       setTimer(timer);
@@ -70,9 +72,11 @@ const GameQuestion = () => {
       setSelectedIdx(null);
       setGameEnded(false);
       setQuestionType(question.type.name);
+      setCurrentQuestionIndex(currentIndex);
+      setQuizLength(quizLength);
       console.log(questionType)
       console.log(question.type.name)
-      if(type === "Puzzle") {
+      if (type === "Puzzle") {
         setRankingOrder(Array.from({ length: question.options.length }, (_, i) => i));
       }
     });
@@ -89,17 +93,17 @@ const GameQuestion = () => {
   }, [game, router]);
 
   const handleAnswer = (answer: number | number[]) => {
-    if(questionType === "Puzzle") {
+    if (questionType === "Puzzle") {
       socket.emit("game:answer", { gameUuid: game, answer: rankingOrder });
     } else {
       socket.emit("game:answer", { gameUuid: game, answer });
-      if(typeof answer === "number") setSelectedIdx(answer);
+      if (typeof answer === "number") setSelectedIdx(answer);
     }
     setWaiting(true);
   };
 
   const renderAnswers = () => {
-    if(waiting) {
+    if (waiting) {
       return (
         <div className="text-xl font-semibold mt-8">
           En attente des autres réponses...
@@ -153,7 +157,7 @@ const GameQuestion = () => {
       </div>
 
       <div className="absolute bottom-4 right-6 text-2xl font-bold bg-white text-black px-4 py-2 rounded-full shadow-lg">
-        1/10
+        {waiting ? "En attente..." : `Question ${currentQuestionIndex} / ${quizLength}`}
       </div>
     </div>
   );
