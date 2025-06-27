@@ -16,6 +16,8 @@ const synclobby: IEvent = {
                 }
                 const playersData = game.players.map(player => ({
                     username: player.username,
+                    socketId: player.socketId,
+                    isHost: player.isHost,
                 }));
                 console.log(playersData)
                 // l'envoie à tous les joueurs du jeu sauf celui qui a envoyé la requête

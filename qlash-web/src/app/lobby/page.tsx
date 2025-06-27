@@ -14,6 +14,7 @@ const Lobby = () => {
 
   const [players, setPlayers] = useState<SimplePlayer[]>([]);
   const [code, setCode] = useState<string | null>(null);
+  const [isHost, setIsHost] = useState<boolean>(false);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(code as string).then(() => {
@@ -26,10 +27,9 @@ const Lobby = () => {
   useEffect(() => {
     socket.on("synclobby", (data) => {
       if (!data) return;
-      console.log("Synchronisation des joueurs dans la salle:", data);
       const { success, players: playersInLobby, gameCode } = data;
-      console.log("gameCode:", gameCode);
       if (success) {
+        setIsHost(playersInLobby.some((player: SimplePlayer) => player.socketId === socket.id && player.isHost));
         setPlayers(playersInLobby);
         setCode(gameCode);
       } else {

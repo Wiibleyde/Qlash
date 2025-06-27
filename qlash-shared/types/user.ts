@@ -1,5 +1,7 @@
 export interface SimplePlayer {
     username: string;
+    socketId: string;
+    isHost?: boolean;
 }
 
 export interface LoggedUser {
