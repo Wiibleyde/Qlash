@@ -23,7 +23,12 @@ const FinalScoreboard = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-purple-500 to-indigo-600 text-white py-10 px-4">
       <h1 className="text-4xl font-extrabold mb-8">Final Scoreboard</h1>
-
+      <button
+        className="mb-8 px-6 py-2 bg-white text-purple-700 font-bold rounded-lg shadow hover:bg-gray-100 transition-colors"
+        onClick={() => window.location.href = '/'}
+      >
+        Retour à l'accueil
+      </button>
       <div className="flex justify-center items-end  w-full max-w-4xl mb-10">
         <div className="flex flex-col items-center">
             <p className="text-lg font-bold mb-2">
@@ -95,6 +100,7 @@ const FinalScoreboard = () => {
             <div className="font-bold text-black">{player.score}</div>
           </div>
         ))}
+        
     </div>
   );
 };

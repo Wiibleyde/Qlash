@@ -5,7 +5,7 @@ import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
 import { socket } from "@/utils/socket";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type QuestionType = "QCM" | "Vrai/Faux" | "Classement";
+type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle";
 
 interface QCMAnswerOption {
   content: string;
@@ -18,7 +18,7 @@ const GameQuestion = () => {
   const [timer, setTimer] = useState(30);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [rankingOrder, setRankingOrder] = useState<number[]>([]);
-  const [questionType] = useState<QuestionType>("QCM");
+  const [questionType, setQuestionType] = useState<QuestionType>("Question à choix multiple");
   const [question, setQuestion] = useState<string>("test");
   const [answers, setAnswers] = useState<QCMAnswerOption[]>([]);
   const [waiting, setWaiting] = useState<boolean>(true);
@@ -48,28 +48,37 @@ const GameQuestion = () => {
         "bg-red-500",
       ],
     },
-    Classement: {
+    Puzzle: {
       question: "Classez ces villes de la plus au nord à la plus au sud :",
       options: ["Lille", "Paris", "Lyon", "Marseille"],
     },
   };
 
   useEffect(() => {
-    if (questionType === "Classement") {
-      setRankingOrder(Array.from({ length: questionData.Classement.options.length }, (_, i) => i));
+    if (questionType === "Puzzle") {
+      setRankingOrder(Array.from({ length: questionData.Puzzle.options.length }, (_, i) => i));
     }
   }, [questionType]);
 
   useEffect(() => {
-    socket.on("game:question", ({ question, timer, questionIndex, answer }) => {
-      console.log("Received question:", question, "with timer:", timer, "for question index:", questionIndex, "and answer:", answer);
-      setAnswers(question.options);
-      setQuestion(question.content);
+    socket.on("game:question", ({ question, timer, questionIndex, answer, type }) => {
+      console.log("Received question:", question, "with timer:", timer, "for question index:", questionIndex, "and answer:", answer, "type:", question.type.name);
+      setAnswers(question.options || []);
+      setQuestion(question.content || "");
       setTimer(timer);
       setWaiting(false);
+      setSelectedIdx(null);
+      setGameEnded(false);
+      setQuestionType(question.type.name);
+      console.log(questionType)
+      console.log(question.type.name)
+      if(type === "Puzzle") {
+        setRankingOrder(Array.from({ length: question.options.length }, (_, i) => i));
+      }
     });
     socket.on("game:wait", () => setWaiting(true));
     socket.on("game:end", () => {
+      setGameEnded(true);
       router.push(`/scoreboard?game=${game}`);
     });
     return () => {
@@ -77,15 +86,28 @@ const GameQuestion = () => {
       socket.off("game:wait");
       socket.off("game:end");
     };
-  }, []);
+  }, [game, router]);
 
-  const handleAnswer = (answer: number) => {
-    socket.emit("game:answer", { gameUuid: game, answer });
+  const handleAnswer = (answer: number | number[]) => {
+    if(questionType === "Puzzle") {
+      socket.emit("game:answer", { gameUuid: game, answer: rankingOrder });
+    } else {
+      socket.emit("game:answer", { gameUuid: game, answer });
+      if(typeof answer === "number") setSelectedIdx(answer);
+    }
     setWaiting(true);
   };
 
   const renderAnswers = () => {
-    if (questionType === "QCM" || questionType === "Vrai/Faux") {
+    if(waiting) {
+      return (
+        <div className="text-xl font-semibold mt-8">
+          En attente des autres réponses...
+        </div>
+      );
+    }
+
+    if (questionType === "Question à choix multiple" || questionType === "Vrai/Faux") {
       return (
         <QCMAnswerGrid
           handleAnswer={handleAnswer}
@@ -95,13 +117,21 @@ const GameQuestion = () => {
       );
     }
 
-    if (questionType === "Classement") {
+    if (questionType === "Puzzle") {
       return (
-        <PuzzleAnswerGrid
-          options={questionData.Classement.options}
-          selectedOrder={rankingOrder}
-          onReorder={setRankingOrder}
-        />
+        <>
+          <PuzzleAnswerGrid
+            options={answers.length ? answers.map(a => a.content) : questionData.Puzzle.options}
+            selectedOrder={rankingOrder}
+            onReorder={setRankingOrder}
+          />
+          <button
+            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
+            onClick={() => handleAnswer(rankingOrder)}
+          >
+            Valider
+          </button>
+        </>
       );
     }
 

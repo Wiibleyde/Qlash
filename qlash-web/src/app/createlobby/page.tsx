@@ -11,15 +11,8 @@ const createQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/quiz`;
 
 const allQuestionTypes = [
   'Question à choix multiple',
-  // 'Checkbox',
   'Vrai/Faux',
   'Puzzle',
-  // 'Type Answer',
-  // 'Quiz + Audio',
-  // 'Slider',
-  // 'Say the Word',
-  // 'Poll',
-  // 'Drop Pin',
 ];
 
 const LobbyCreate = () => {

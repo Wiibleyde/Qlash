@@ -106,7 +106,7 @@ const DraggableQuizForm: React.FC<Props> = ({ onSubmit }) => {
     }
 
     onSubmit({
-      type: "Classement",
+      type: "Puzzle",
       question: question.trim(),
       options: cleanedOptions,
       correctAnswer: cleanedOptions[0],
