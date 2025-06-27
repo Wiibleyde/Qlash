@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Input from '@/components/ui/Input';
 import React, { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
-import { router, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { socket } from '@/utils/socket';
 
 export default function CreateGame() {
@@ -18,7 +18,7 @@ export default function CreateGame() {
         return () => {
             socket.off('create');
         };
-    }, []);
+    }, [router]);
 
     const handleCreateGame = () => {
         socket.emit('create', { username });

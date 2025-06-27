@@ -30,7 +30,7 @@ export default function Hostlobby() {
         return () => {
             socket.off('synclobby');
         };
-    }, []);
+    }, [game]);
 
     return (
         <View style={styles.container}>
