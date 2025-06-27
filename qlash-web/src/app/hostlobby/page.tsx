@@ -1,22 +1,35 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Button from '@/components/Button';
 import PresetSelector from '@/components/PresetSelector';
-
-const quizPresets = [
-  '🇫🇷 Culture française',
-  '🧪 Science',
-  '🧠 Logique',
-  '🎨 Art & Littérature',
-  '🌍 Géographie',
-  '📺 Pop Culture',
-];
 
 const LobbyHost = () => {
   const [players] = useState(['Alice', 'Bob', 'Charlie']);
   const [selectedPresets, setSelectedPresets] = useState<string[]>([]);
   const [selectingPreset, setSelectingPreset] = useState(false);
+
+  const [quizPresets, setQuizPresets] = useState<{ id: string; name: string }[]>([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(true);
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const res = await fetch('http://10.33.69.135:8000/quizzes/latest');
+        const data = await res.json();
+        setQuizPresets(data.map((quiz: any) => ({
+          id: quiz.id,
+          name: quiz.name,
+        })));
+      } catch (error) {
+        console.error('Erreur lors du fetch des quizzes:', error);
+      } finally {
+        setLoadingQuizzes(false);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
 
   const handleAddPreset = (preset: string) => {
     if (!selectedPresets.includes(preset)) {
@@ -68,7 +81,14 @@ const LobbyHost = () => {
             <>
               <div>
                 <h2 className="text-2xl font-extrabold mb-4 text-purple-700">Choisissez un quiz</h2>
-                <PresetSelector presets={quizPresets} onSelect={handleAddPreset} />
+                {loadingQuizzes ? (
+                  <p className="text-gray-400 italic">Chargement des quizz...</p>
+                ) : (
+                  <PresetSelector
+                    presets={quizPresets.map(q => q.name)}
+                    onSelect={handleAddPreset}
+                  />
+                )}
               </div>
               <div className="flex justify-end">
                 <div className="w-1/3">

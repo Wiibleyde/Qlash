@@ -21,7 +21,7 @@ const Join = () => {
     socket.emit("join", { username, gameCode });
   }
 
-  1
+  
 
   useEffect(() => {
     socket.on("join", (data) => {

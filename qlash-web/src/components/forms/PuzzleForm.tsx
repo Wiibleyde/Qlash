@@ -125,7 +125,7 @@ const DraggableQuizForm: React.FC<Props> = ({ onSubmit }) => {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={options.map((o) => o.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div className="">
             {options.map((opt, index) => (
               <SortableOption
                 key={opt.id}
