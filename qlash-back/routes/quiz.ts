@@ -88,6 +88,29 @@ const quizRoute: IRoute = {
                     }
                 });
         });
+
+        app.get('/quizzes/latest', (req: Request, res: Response) => {
+            QuizService.getLatestQuizzes()
+                .then(quizzes => {
+                    res.status(200).json(quizzes);
+                })
+                .catch(error => {
+                    console.error('Error fetching latest quizzes:', error);
+                    res.status(500).json({ message: 'Internal server error' });
+                });
+        });
+
+        app.get('/quizzes', (req: Request, res: Response) => {
+            const params = req.query;
+            QuizService.getQuizzes(params.search as string)
+                .then(quizzes => {
+                    res.status(200).json(quizzes);
+                })
+                .catch(error => {
+                    console.error('Error fetching quizzes:', error);
+                    res.status(500).json({ message: 'Internal server error' });
+                });
+        });
     }
 };
 

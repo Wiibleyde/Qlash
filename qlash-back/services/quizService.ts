@@ -154,4 +154,32 @@ export class QuizService {
             where: { id: quizId }
         });
     }
+
+    static async getLatestQuizzes() {
+        const quizzes = await prisma.quiz.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: 10,
+            include: {
+                author: true
+            }
+        });
+        return quizzes;
+    }
+
+    static async getQuizzes(search: string) {
+        const quizzes = await prisma.quiz.findMany({
+            where: {
+                name: {
+                    contains: search,
+                    mode: 'insensitive'
+                }
+            },
+            include: {
+                author: true
+            }
+        });
+        return quizzes;
+    }
 }
