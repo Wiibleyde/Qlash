@@ -1,3 +1,4 @@
+import { QuizService } from "../services/quizService";
 import { games, type IEvent } from "./webserver";
 
 const startgame: IEvent = {
@@ -23,7 +24,19 @@ const startgame: IEvent = {
                 socket.emit("startgame", { success: false, message: "No quiz selected." });
                 return;
             }
-            game.quiz = selectedQuiz;
+            try {
+                const quizz = QuizService.getQuizById(selectedQuiz.id);
+                if (!quizz) {
+                    console.error(`Quiz with ID ${selectedQuiz.id} not found.`);
+                    socket.emit("startgame", { success: false, message: "Quiz not found." });
+                    return;
+                }
+                game.quiz = selectedQuiz;
+            } catch (error) {
+                console.error(`Error fetching quiz with ID ${selectedQuiz.id}:`, error);
+                socket.emit("startgame", { success: false, message: "Error fetching quiz." });
+                return;
+            }
             socket.to(gameUuid).emit("startgame", {
                 success: true,
                 message: "Game is starting.",
