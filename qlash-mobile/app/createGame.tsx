@@ -1,10 +1,30 @@
 import { View, Text, StyleSheet } from 'react-native';
 import Input from '@/components/ui/Input';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
-import { router } from 'expo-router';
+import { router, useRouter } from 'expo-router';
+import { socket } from '@/utils/socket';
 
 export default function createGame() {
+
+    const [username, setUsername] = useState<string>('')
+
+    const router = useRouter();
+
+    useEffect(() => {
+        socket.on("create", (data) => {
+            const { gameUuid } = data;
+            router.push(`/hostLobby?game=${gameUuid}`);
+        });
+        return () => {
+            socket.off("create");
+        }
+    }, []);
+
+    const handleCreateGame = () => {
+        socket.emit("create", { username });
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.titleContainer}>
@@ -13,16 +33,15 @@ export default function createGame() {
                     <Input
                         title="Username"
                         placeholder="Username"
-                        type="username"
+                        value={username}
+                        onChangeText={(text) => setUsername(text)}
                     />
                 </View>
             </View>
             <View style={styles.buttonContainer}>
                 <Button
                     text="Create"
-                    action={() => {
-                        router.push('/hostLobby');
-                    }}
+                    action={handleCreateGame}
                     variants="primary"
                 />
             </View>
