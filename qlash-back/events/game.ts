@@ -31,12 +31,16 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
         questionIndex: index,
         question,
         answers,
+        currentIndex: game.currentQuestionIndex + 1,
+        quizLength: game.quiz?.questions?.length || 0,
         timer: TIMER,
     });
     socket.emit("game:question", {
         questionIndex: index,
         question,
         answers,
+        currentIndex: game.currentQuestionIndex + 1,
+        quizLength: game.quiz?.questions?.length || 0,
         timer: TIMER,
     });
     let timeLeft = TIMER;
