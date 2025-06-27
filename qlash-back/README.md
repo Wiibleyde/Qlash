@@ -24,6 +24,14 @@ This project was created using `bun init` in bun v1.2.13. [Bun](https://bun.sh) 
 
 FAUT INIT LES PTN DE DONNE DONC TU FAIS UN 
 ```bash
+bun prisma migrate deploy
+```
+Puis tu fais un `bun prisma generate` pour générer les types Prisma :
+```bash
+bun prisma generate
+```
+Puis tu fais un seed pour remplir la base de données avec les données initiales :
+```bash
 bun prisma db seed
 ```
 
