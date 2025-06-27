@@ -1,11 +1,14 @@
 "use client";
 import FinalScoreboard from "@/components/FinalScoreboard";
-import React from "react";
+import { useSearchParams } from "next/navigation";
 
 const Scoreboard = () => {
 
+  const searchParams = useSearchParams();
+  const game = searchParams.get('game');
+
   return (
-    <FinalScoreboard />
+    <FinalScoreboard game={game as string} />
   );
 };
 
