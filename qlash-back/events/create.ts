@@ -14,12 +14,15 @@ const create: IEvent = {
                 socketId: socket.id,
                 gameId: gameUuid,
                 isHost: true,
+                isAnswered: false,
+                score: 0,
             };
             const game: Game = {
                 id: gameUuid,
                 code: gameCode,
                 players: [],
                 host: player,
+                currentQuestionIndex: 0,
             };
             games.push(game);
             game.players.push(player);

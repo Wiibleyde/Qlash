@@ -1,3 +1,4 @@
+import type { Player } from "../../qlash-shared/types/game";
 import { games, type IEvent } from "./webserver";
 
 const join: IEvent = {
@@ -11,11 +12,13 @@ const join: IEvent = {
                 socket.emit("join", { joined: false, message: "Game not found." });
                 return;
             }
-            const player = {
+            const player: Player = {
                 username,
                 socketId: socket.id,
                 gameId: game.id,
                 isHost: false,
+                isAnswered: false,
+                score: 0,
             };
             game.players.push(player);
             socket.join(game.id);

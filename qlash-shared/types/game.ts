@@ -5,7 +5,8 @@ export interface Game {
     code: string;
     players: Player[];
     host: Player;
-    quiz: IQuiz;
+    quiz?: IQuiz;
+    currentQuestionIndex: number;
 }
 
 
@@ -14,4 +15,6 @@ export interface Player {
     socketId: string;
     gameId: string;
     isHost: boolean;
+    isAnswered: boolean;
+    score: number;
 }
