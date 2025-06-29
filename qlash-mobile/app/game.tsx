@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AnswerButton from '@/components/ui/AnswerButton';
 import Button from '@/components/ui/Button';
+import QCMAnswerGrid from '@/components/ui/grid/QCMAnswerGrid';
 
 const getContainerStyle = (bool: true | false) => {
     switch (bool) {
@@ -44,36 +45,9 @@ export default function Game() {
                 </View>
             </View>
             {!answersSelectedBool ? (
-                <View style={styles.answerButtonsContainer}>
-                    <AnswerButton
-                        action={() => {
-                            setAnswersSelectedBool(true);
-                        }}
-                        text="Answer 1"
-                        variant="red"
-                    />
-                    <AnswerButton
-                        action={() => {
-                            setAnswersSelectedBool(true);
-                        }}
-                        text="Answer 2"
-                        variant="blue"
-                    />
-                    <AnswerButton
-                        action={() => {
-                            setAnswersSelectedBool(true);
-                        }}
-                        text="Answer 3"
-                        variant="yellow"
-                    />
-                    <AnswerButton
-                        action={() => {
-                            setAnswersSelectedBool(true);
-                        }}
-                        text="Answer 4"
-                        variant="green"
-                    />
-                </View>
+                <QCMAnswerGrid
+                    setAnswersSelectedBool={setAnswersSelectedBool}
+                />
             ) : waitingForPlayers ? (
                 <View style={styles.answerButtonsContainer}>
                     <Button
