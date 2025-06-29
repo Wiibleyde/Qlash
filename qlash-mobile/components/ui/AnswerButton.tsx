@@ -11,6 +11,17 @@ const getButtonStyle = (variant: 'red' | 'blue' | 'yellow' | 'green') => {
             return styles.buttonYellow;
         case 'green':
             return styles.buttonGreen;
+    }
+};
+
+const getTrueFalseButtonStyle = (type: 'classic' | 'true' | 'false') => {
+    switch (type) {
+        case 'classic':
+            return styles.button;
+        case 'true':
+            return styles.trueButton;
+        case 'false':
+            return styles.falseButton;
         default:
             return styles.button;
     }
@@ -20,15 +31,17 @@ export default function AnswerButton({
     action,
     text,
     variant = 'blue',
+    type = 'classic',
 }: {
     action?: () => void;
     text?: string;
     variant?: 'red' | 'blue' | 'yellow' | 'green';
+    type?: 'classic' | 'true' | 'false';
 }) {
     return (
         <TouchableOpacity
             onPress={action}
-            style={[styles.button, getButtonStyle(variant)]}
+            style={[getTrueFalseButtonStyle(type), getButtonStyle(variant)]}
         >
             <Text style={styles.buttonText}>{text}</Text>
         </TouchableOpacity>
@@ -44,6 +57,34 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: '40%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    trueButton: {
+        padding: 15,
+        backgroundColor: '#00c950',
+        borderRadius: 10,
+        width: '90%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '20%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    falseButton: {
+        padding: 15,
+        backgroundColor: '#fa2c37',
+        borderRadius: 10,
+        width: '90%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '20%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.4,
