@@ -97,6 +97,7 @@ const gameEvent: IEvent = {
 
             console.log(answer)
             console.log(question.options)
+            console.log(question.type?.name)
 
             if (question.type?.name === "Puzzle") {
                 // answer est un tableau d'IDs dans l'ordre choisi par le joueur
@@ -119,6 +120,24 @@ const gameEvent: IEvent = {
                 player.isAnswered = true;
                 socket.emit("game:answer", {});
                 return;
+            } else if (question.type?.name === "Buzzer") {
+                const isCorrect = question.options && answer === question.options[0]?.content;
+                if (isCorrect) {
+                    const timeTaken = (Date.now() - game.currentQuestionStartTime!) / 1000; // Convert to seconds
+                    const score = Math.max(0, Math.floor(1000 * (TIMER - timeTaken) / TIMER));
+                    player.score += score;
+                    game.players.forEach(p => p.isAnswered = true);
+                    socket.emit("game:answer", {});
+                    console.log(`Player ${player.username} a répondu correctement au buzzer ! Score: ${player.score}`);
+                    return;
+                } else {
+                    if (timers[gameUuid]) {
+                        clearInterval(timers[gameUuid]);
+                    }
+                    sendQuestion(gameUuid, socket);
+                    console.log(`Player ${player.username} a répondu incorrectement au buzzer, question renvoyée.`);
+                    return;
+                }
             }
 
             const currentQuestionOptions = question.options || [];
@@ -142,6 +161,16 @@ const gameEvent: IEvent = {
 
             player.isAnswered = true;
             socket.emit("game:answer", {});
+        });
+
+        socket.on("game:buzzed", (data) => {
+            const { gameUuid } = data;
+            const game = games.find((g: Game) => g.id === gameUuid);
+            if (!game) {
+                console.error(`Game with UUID ${gameUuid} not found.`);
+                return;
+            }
+            socket.to(gameUuid).emit("game:wait", {});
         });
     }
 }

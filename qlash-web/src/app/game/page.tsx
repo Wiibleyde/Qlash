@@ -13,6 +13,11 @@ interface QCMAnswerOption {
   content: string;
 }
 
+interface Player {
+  name: string;
+  score: number;
+}
+
 const GameQuestion = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,7 +33,7 @@ const GameQuestion = () => {
   const [quizLength, setQuizLength] = useState<number>(0);
   const [buzzerAnswer, setBuzzerAnswer] = useState<string>("");
 
-  const [players, setPlayers] = useState<string[]>([]); // fo afficher les noms des joueurs bb
+  const [players, setPlayers] = useState<Player[]>([]); // fo afficher les noms des joueurs bb
   const [yourScore, setYourScore] = useState(0);
   const [hasBuzzed, setHasBuzzed] = useState(false);
   const [buzzerAnswerInput, setBuzzerAnswerInput] = useState("");
@@ -36,7 +41,7 @@ const GameQuestion = () => {
   const handleBuzz = () => {
     if (!hasBuzzed) {
       setHasBuzzed(true);
-      socket.emit("game:buzz", { gameUuid: game });
+      socket.emit("game:buzzed", { gameUuid: game });
     }
   };
 
@@ -73,15 +78,11 @@ const GameQuestion = () => {
       setQuestionType(question.type.name);
       setCurrentQuestionIndex(currentIndex);
       setQuizLength(quizLength);
-      console.log("question", question);
-      console.log("type", question.type.name);
-      console.log("type", type);
-      console.log(question.type.name)
       if (question.type.name === "Puzzle" && question.options) {
         console.log("Setting ranking order for Puzzle type", question.options);
         setRankingOrder(answersFromServer.map((opt: QCMAnswerOption) => opt.id));
       }
-      if (type === "Buzzer") {
+      if (question.type.name === "Buzzer") {
         setBuzzerAnswer(question.correctAnswer || "");
       }
     });
