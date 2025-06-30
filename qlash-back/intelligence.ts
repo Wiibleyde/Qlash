@@ -33,7 +33,7 @@ export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
                             Rules:
                             - For "Question à choix multiple": 4 options, only one correct
                             - For "Vrai/Faux": exactly 2 options ("Vrai" and "Faux"), only one correct
-                            - For "Puzzle": 3-4 options representing elements to order, mark the first element as correct
+                            - For "Puzzle": 3-4 options representing elements to order, mark the first element as correct. IMPORTANT: Do not include dates, years, or chronological markers in puzzle options as this makes the ordering too obvious
                             - Ensure only one option per question has isCorrect: true
                             - Vary the question types across the 5 questions`
                         }
