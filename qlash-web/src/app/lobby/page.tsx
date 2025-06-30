@@ -182,7 +182,7 @@ const Lobby = () => {
               </div>
             </div>
 
-            <Button onClick={handleStartGame}>
+            <Button onClick={handleStartGame} disabled={selectedPresets.length === 0}>
               🚀 Démarrer la partie
             </Button>
           </div>

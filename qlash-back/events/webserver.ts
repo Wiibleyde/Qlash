@@ -12,6 +12,7 @@ import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config'
 import startgame from './startgame';
 import gameEvent from './game';
 import { Logger } from '../utils/logger';
+import disconnect from './disconnect';
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -24,7 +25,8 @@ const events: IEvent[] = [
     create,
     synclobby,
     startgame,
-    gameEvent
+    gameEvent,
+    disconnect
 ];
 
 export const games: Game[] = [];
@@ -68,10 +70,6 @@ export const initServer = (port: number) => {
         logger.info(`A user connected: ${socket.id}`);
 
         events.forEach(event => event.register(socket));
-
-        socket.on('disconnect', () => {
-            logger.info(`User disconnected: ${socket.id}`);
-        });
     });
 
     server.listen(port, () => {
