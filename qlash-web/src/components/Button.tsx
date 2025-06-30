@@ -8,7 +8,7 @@ const Button = ({
   return (
     <button
       {...props}
-      className={`w-full bg-[#694aff] text-white p-2 rounded-full hover:opacity-80 cursor-pointer transition duration-300 ease-in-out ${className}`}
+      className={`w-full text-white p-2 rounded-full bg-[#694aff] ${props.disabled ? "opacity-50 cursor-not-allowed" :"hover:opacity-80 cursor-pointer"}  transition duration-300 ease-in-out ${className}`}
     >
       {children}
     </button>

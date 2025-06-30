@@ -6,7 +6,10 @@ const create: IEvent = {
     register: (socket) => {
         socket.on("create", (data) => {
             const { username } = data;
-            console.log(`User ${username} is creating a game...`);
+            if (!username || username.trim() === "") {
+                socket.emit("create", { success: false, message: "Username is required to create a game." });
+                return;
+            }
             const gameCode = createGameCode();
             const gameUuid = createGameUuid();
             const player: Player = {
@@ -28,6 +31,7 @@ const create: IEvent = {
             game.players.push(player);
             socket.join(gameUuid);
             socket.emit("create", {
+                success: true,
                 gameUuid
             });
             console.log(`User ${username} created a game with code ${gameCode}`);

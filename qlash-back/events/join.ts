@@ -5,6 +5,11 @@ const join: IEvent = {
     register: (socket) => {
         socket.on("join", (data) => {
             const { username, gameCode } = data;
+            if (!username || username.trim() === "" || !gameCode || gameCode.length !== 6) {
+                console.error("Username is required to join a game.");
+                socket.emit("join", { joined: false, message: "Invalid username or game code." });
+                return;
+            }
             console.log(`User ${username} is joining game with code ${gameCode}...`);
             const game = games.find(g => g.code === gameCode);
             if (!game) {

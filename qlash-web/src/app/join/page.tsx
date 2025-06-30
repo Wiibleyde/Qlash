@@ -17,23 +17,20 @@ const Join = () => {
 
   const router = useRouter();
 
+  const isDisabled = !username.trim() || gameCode.length !== 6;
+
   const handleJoinGame = () => {
     socket.emit("join", { username, gameCode });
   }
-
-  
 
   useEffect(() => {
     socket.on("join", (data) => {
       const { joined, gameUuid, message } = data;
       if (joined) {
         router.push(`/lobby?game=${gameUuid}`);
-        console.log(`Joined game with UUID: ${gameUuid}`);
         // Redirect to game page or update UI accordingly
       } else {
-        toast.error(`Failed to join game: the information provided is incorrect or the game does not exist.`);
-        console.error(`Failed to join game: ${message}`);
-        // Show error message to user
+        toast.error(`Impossible de rejoindre la partie : ${message}`);
       }
     });
     return () => {
@@ -64,7 +61,7 @@ const Join = () => {
             className='mb-4'
             length={6}
           />
-          <Button onClick={handleJoinGame}>
+          <Button onClick={handleJoinGame} disabled={isDisabled}>
             Join Game
           </Button>
         </div>

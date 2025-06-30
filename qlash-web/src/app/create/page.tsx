@@ -5,6 +5,7 @@ import Input from '@/components/Input'
 import { socket } from '@/utils/socket';
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar';
+import { toast } from 'sonner';
 
 const Join = () => {
 
@@ -14,8 +15,12 @@ const Join = () => {
 
   useEffect(() => {
     socket.on("create", (data) => {
-      const { gameUuid } = data;
-      router.push(`/lobby?game=${gameUuid}`);
+      const { success, gameUuid } = data;
+      if (success) {
+        router.push(`/lobby?game=${gameUuid}`);
+      } else {
+        toast.error("Impossible de créer la partie, le nom d'utilisateur est requis.");
+      }
     });
     return () => {
       socket.off("create");
@@ -42,7 +47,7 @@ const Join = () => {
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-          <Button onClick={handleCreateGame}>
+          <Button onClick={handleCreateGame} disabled={!username.trim()}>
             Create Game
           </Button>
         </div>
