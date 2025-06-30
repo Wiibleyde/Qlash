@@ -30,6 +30,8 @@ const LobbyCreate = () => {
   const [step, setStep] = useState<'list' | 'choose' | 'form'>('list');
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [iaPrompt, setIaPrompt] = useState('');
+  const [showIaPromptInput, setShowIaPromptInput] = useState(false);
 
   useEffect(() => {
     if (quizId) {
@@ -115,6 +117,8 @@ const LobbyCreate = () => {
   const handleCancel = () => {
     setStep('list');
     setSelectedType(null);
+    setShowIaPromptInput(false);
+    setIaPrompt('');
   };
 
   const handleSaveQuiz = async () => {
@@ -155,12 +159,11 @@ const LobbyCreate = () => {
     }
   };
 
-  const handleCreateIaQuiz = async () => {
-    const prompt = "La formule 1"
+  const handleCreateIaQuiz = async (prompt: string) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${createIaQuizApiUrl}/${prompt}`, {
+      const response = await fetch(`${createIaQuizApiUrl}/${encodeURIComponent(prompt)}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -262,6 +265,41 @@ const LobbyCreate = () => {
                     ))}
                   </ul>
                 )}
+                {showIaPromptInput && (
+                  <div className="mt-4 p-4 border border-purple-400 rounded-md bg-purple-50 text-black">
+                    <label className="block mb-2 font-semibold" htmlFor="iaPrompt">Entrez le prompt pour le quiz IA :</label>
+                    <input
+                      id="iaPrompt"
+                      type="text"
+                      value={iaPrompt}
+                      onChange={(e) => setIaPrompt(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Ex: La formule 1"
+                    />
+                    <div className="flex justify-end gap-2 mt-3">
+                      <Button
+                        onClick={() => {
+                          if (!iaPrompt.trim()) {
+                            alert('Veuillez entrer un prompt');
+                            return;
+                          }
+                          handleCreateIaQuiz(iaPrompt);
+                          setShowIaPromptInput(false);
+                          setIaPrompt('');
+                        }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Chargement...' : 'Créer le quiz IA'}
+                      </Button>
+                      <Button onClick={() => {
+                        setShowIaPromptInput(false);
+                        setIaPrompt('');
+                      }}>
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex justify-between gap-4">
                 <div className="w-1/2">
@@ -274,7 +312,7 @@ const LobbyCreate = () => {
                 </div>
                 <div className="w-1/2 flex justify-end gap-2">
                   <Button onClick={() => setStep('choose')}>➕ Ajouter une question</Button>
-                  <Button onClick={handleCreateIaQuiz}>🧠 Créer un quiz IA</Button>
+                  <Button onClick={() => setShowIaPromptInput(true)}>🧠 Créer un quiz IA</Button>
                 </div>
               </div>
             </>
