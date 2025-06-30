@@ -5,6 +5,7 @@ import healthRoute from './health';
 import quizRoute from './quiz';
 import userRoute from './user';
 import gameRoute from './game';
+import iaRoute from './ia';
 
 
 const routes: IRoute[] = [
@@ -12,7 +13,8 @@ const routes: IRoute[] = [
     authRoute,
     quizRoute,
     userRoute,
-    gameRoute
+    gameRoute,
+    iaRoute
 ];
 
 export const registerRoutes = (app: Express) => {

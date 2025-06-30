@@ -8,6 +8,7 @@ import QuestionFormWrapper from '@/components/QuestionFormWrapper';
 import type { IQuiz, IQuestion, IOption } from '../../../../qlash-shared/types/quiz';
 
 const createQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/quiz`;
+const createIaQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/ia/quiz`;
 
 const allQuestionTypes = [
   'Question à choix multiple',
@@ -18,7 +19,7 @@ const allQuestionTypes = [
 const LobbyCreate = () => {
   const searchParams = useSearchParams();
   const quizId = searchParams.get('quizId');
-  
+
   const [players] = useState(['Alice', 'Bob', 'Charlie']);
   const [quiz, setQuiz] = useState<Partial<IQuiz>>({
     name: '',
@@ -69,7 +70,7 @@ const LobbyCreate = () => {
   }) => {
     const newQuestion: Omit<IQuestion, 'id' | 'quizId' | 'typeId' | 'createdAt' | 'updatedAt'> = {
       content: formData.question,
-      type: { 
+      type: {
         id: '',
         name: formData.type,
         description: null,
@@ -91,7 +92,7 @@ const LobbyCreate = () => {
       ...prev,
       questions: [...(prev.questions || []), newQuestion as IQuestion]
     }));
-    
+
     setStep('list');
     setSelectedType(null);
   };
@@ -113,7 +114,7 @@ const LobbyCreate = () => {
       const method = quiz.id ? 'PUT' : 'POST';
       const url = quiz.id ? `${createQuizApiUrl}/${quiz.id}` : createQuizApiUrl;
       console.log('Saving quiz:', method, url, quiz);
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -126,11 +127,11 @@ const LobbyCreate = () => {
       if (response.ok) {
         const result = await response.json();
         console.log('Quiz sauvegardé:', result);
-        
+
         if (!quiz.id && result.quiz) {
           setQuiz(result.quiz);
         }
-        
+
         alert(quiz.id ? 'Quiz mis à jour avec succès!' : 'Quiz créé avec succès!');
       } else {
         const errorData = await response.json();
@@ -139,6 +140,57 @@ const LobbyCreate = () => {
     } catch (error) {
       console.error('Erreur:', error);
       alert('Erreur lors de la sauvegarde du quiz');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateIaQuiz = async () => {
+    const prompt = "La formule 1"
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${createIaQuizApiUrl}/${prompt}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Quiz IA créé:', result);
+
+        // Update quiz state with AI-generated data
+        if (result.quiz) {
+          // If the API returns a complete quiz object
+          setQuiz(result.quiz);
+        } else if (result.questions) {
+          // If the API returns just questions
+          setQuiz(prev => ({
+            ...prev,
+            name: prev.name || `Quiz IA - ${prompt}`,
+            description: prev.description || `Quiz généré par IA sur le thème: ${prompt}`,
+            questions: result.questions
+          }));
+        } else if (result.name || result.questions) {
+          // If the result is the quiz object directly
+          setQuiz(prev => ({
+            ...prev,
+            ...result,
+            name: result.name || prev.name || `Quiz IA - ${prompt}`,
+            description: result.description || prev.description || `Quiz généré par IA sur le thème: ${prompt}`
+          }));
+        }
+
+        alert('Quiz IA créé avec succès!');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de la création du quiz IA');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la création du quiz IA');
     } finally {
       setIsLoading(false);
     }
@@ -156,7 +208,7 @@ const LobbyCreate = () => {
                 <h2 className="text-2xl font-extrabold mb-4 text-purple-700">
                   {quiz.id ? 'Modifier le Quiz' : 'Créer un Quiz'}
                 </h2>
-                
+
                 <div className="mb-6 space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -170,7 +222,7 @@ const LobbyCreate = () => {
                       placeholder="Entrez le nom du quiz"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Description
@@ -211,15 +263,16 @@ const LobbyCreate = () => {
 
               <div className="flex justify-between gap-4">
                 <div className="w-1/2">
-                  <Button 
-                    onClick={handleSaveQuiz} 
+                  <Button
+                    onClick={handleSaveQuiz}
                     disabled={isLoading || !quiz.name || quiz.questions?.length === 0}
                   >
                     {isLoading ? '💾 Sauvegarde...' : quiz.id ? '💾 Mettre à jour le quiz' : '💾 Sauvegarder le quiz'}
                   </Button>
                 </div>
-                <div className="w-1/2">
+                <div className="w-1/2 flex justify-end gap-2">
                   <Button onClick={() => setStep('choose')}>➕ Ajouter une question</Button>
+                  <Button onClick={handleCreateIaQuiz}>🧠 Créer un quiz IA</Button>
                 </div>
               </div>
             </>
