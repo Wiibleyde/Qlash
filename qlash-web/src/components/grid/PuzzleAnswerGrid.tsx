@@ -17,10 +17,15 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
+interface QCMAnswerOption {
+  id: string;
+  content: string;
+}
+
 interface PuzzleAnswerGridProps {
-  options: string[];
-  selectedOrder: number[];
-  onReorder: (newOrder: number[]) => void;
+  options: QCMAnswerOption[];
+  selectedOrder: string[];
+  onReorder: (newOrder: string[]) => void;
 }
 
 interface SortableItemProps {
@@ -62,6 +67,7 @@ const PuzzleAnswerGrid: React.FC<PuzzleAnswerGridProps> = ({
   selectedOrder,
   onReorder,
 }) => {
+  console.log("PuzzleAnswerGrid rendered with options:", options);
   const sensors = useSensors(useSensor(PointerSensor));
 
   const ids = selectedOrder.map(String);
@@ -69,9 +75,8 @@ const PuzzleAnswerGrid: React.FC<PuzzleAnswerGridProps> = ({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = ids.indexOf(active.id.toString());
-      const newIndex = ids.indexOf(over.id.toString());
-
+      const oldIndex = selectedOrder.indexOf(active.id.toString());
+      const newIndex = selectedOrder.indexOf(over.id.toString());
       const newOrder = arrayMove(selectedOrder, oldIndex, newIndex);
       onReorder(newOrder);
     }
@@ -81,13 +86,16 @@ const PuzzleAnswerGrid: React.FC<PuzzleAnswerGridProps> = ({
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={ids} strategy={verticalListSortingStrategy}>
         <div className="space-y-3 w-full max-w-3xl mx-auto">
-          {selectedOrder.map((originalIdx) => (
-            <SortableItem
-              key={originalIdx}
-              id={originalIdx.toString()}
-              label={options[originalIdx]}
-            />
-          ))}
+          {selectedOrder.map((id) => {
+            const option = options.find((opt) => String(opt.id) === id);
+            return (
+              <SortableItem
+                key={id}
+                id={id}
+                label={option?.content || ""}
+              />
+            );
+          })}
         </div>
       </SortableContext>
     </DndContext>

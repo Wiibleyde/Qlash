@@ -16,7 +16,13 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
     game.currentQuestionStartTime = Date.now();
     console.log(game)
     const question = game.quiz?.questions?.[index];
-    const answers = question?.options
+
+    let answers = question?.options ? [...question.options] : [];
+
+    if (question?.type?.name === "Puzzle") {
+        // Random order for puzzle questions
+        answers = [...answers]?.sort(() => Math.random() - 0.5);
+    }
 
     if (!question) {
         console.error(`End of quiz reached for game ${gameUuid}.`);
@@ -90,6 +96,30 @@ const gameEvent: IEvent = {
             }
 
             console.log(answer)
+            console.log(question.options)
+
+            if (question.type?.name === "Puzzle") {
+                // answer est un tableau d'IDs dans l'ordre choisi par le joueur
+                const correctOrder = [...(question.options || [])]
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map(opt => opt.id);
+
+                const isCorrect = Array.isArray(answer) &&
+                    answer.length === correctOrder.length &&
+                    answer.every((id: string, idx: number) => id === correctOrder[idx]);
+
+                if (isCorrect) {
+                    const timeTaken = (Date.now() - game.currentQuestionStartTime!) / 1000;
+                    const score = Math.max(0, Math.floor(1000 * (TIMER - timeTaken) / TIMER));
+                    player.score += score;
+                    console.log(`Player ${player.username} a bien ordonné le puzzle ! Score: ${player.score}`);
+                } else {
+                    console.log(`Player ${player.username} a mal ordonné le puzzle.`);
+                }
+                player.isAnswered = true;
+                socket.emit("game:answer", {});
+                return;
+            }
 
             const currentQuestionOptions = question.options || [];
             const userAnswer = currentQuestionOptions[answer];

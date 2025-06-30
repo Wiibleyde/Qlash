@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle";
 
 interface QCMAnswerOption {
+  id: string;
   content: string;
 }
 
@@ -17,12 +18,11 @@ const GameQuestion = () => {
   const game = searchParams.get('game');
   const [timer, setTimer] = useState(30);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-  const [rankingOrder, setRankingOrder] = useState<number[]>([]);
+  const [rankingOrder, setRankingOrder] = useState<string[]>([]);
   const [questionType, setQuestionType] = useState<QuestionType>("Question à choix multiple");
   const [question, setQuestion] = useState<string>("test");
   const [answers, setAnswers] = useState<QCMAnswerOption[]>([]);
   const [waiting, setWaiting] = useState<boolean>(true);
-  const [gameEnded, setGameEnded] = useState<boolean>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [quizLength, setQuizLength] = useState<number>(0);
 
@@ -33,56 +33,30 @@ const GameQuestion = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const questionData = {
-    QCM: {
-      question: "Quelle est la capitale de la France ?",
-      colors: [
-        "bg-red-500",
-        "bg-blue-500",
-        "bg-yellow-400",
-        "bg-green-500",
-      ],
-    },
-    "Vrai/Faux": {
-      question: "La Terre est plate.",
-      colors: [
-        "bg-green-500",
-        "bg-red-500",
-      ],
-    },
-    Puzzle: {
-      question: "Classez ces villes de la plus au nord à la plus au sud :",
-      options: ["Lille", "Paris", "Lyon", "Marseille"],
-    },
-  };
-
   useEffect(() => {
-    if (questionType === "Puzzle") {
-      setRankingOrder(Array.from({ length: questionData.Puzzle.options.length }, (_, i) => i));
-    }
-  }, [questionType]);
-
-  useEffect(() => {
-    socket.on("game:question", ({ question, timer, questionIndex, answer, type, currentIndex, quizLength }) => {
+    socket.on("game:question", ({ question, timer, questionIndex, answers: answersFromServer, type, currentIndex, quizLength }) => {
       console.log("Received question:", currentIndex, quizLength);
-      setAnswers(question.options || []);
+      console.log("Question data:", answersFromServer);
+      console.log("Question type:", question.options)
+      setAnswers(answersFromServer || []);
       setQuestion(question.content || "");
       setTimer(timer);
       setWaiting(false);
       setSelectedIdx(null);
-      setGameEnded(false);
       setQuestionType(question.type.name);
       setCurrentQuestionIndex(currentIndex);
       setQuizLength(quizLength);
-      console.log(questionType)
+      console.log("question", question);
+      console.log("type", question.type.name);
+      console.log("type", type);
       console.log(question.type.name)
-      if (type === "Puzzle") {
-        setRankingOrder(Array.from({ length: question.options.length }, (_, i) => i));
+      if (question.type.name === "Puzzle" && question.options) {
+        console.log("Setting ranking order for Puzzle type", question.options);
+        setRankingOrder(answersFromServer.map((opt: QCMAnswerOption) => opt.id));
       }
     });
     socket.on("game:wait", () => setWaiting(true));
     socket.on("game:end", () => {
-      setGameEnded(true);
       router.push(`/scoreboard?game=${game}`);
     });
     return () => {
@@ -92,7 +66,9 @@ const GameQuestion = () => {
     };
   }, [game, router]);
 
-  const handleAnswer = (answer: number | number[]) => {
+  const handleAnswer = (answer: number | string[]) => {
+    console.log("Submitting answer:", answer);
+    console.log("Question type:", questionType);
     if (questionType === "Puzzle") {
       socket.emit("game:answer", { gameUuid: game, answer: rankingOrder });
     } else {
@@ -125,7 +101,7 @@ const GameQuestion = () => {
       return (
         <>
           <PuzzleAnswerGrid
-            options={answers.length ? answers.map(a => a.content) : questionData.Puzzle.options}
+            options={answers}
             selectedOrder={rankingOrder}
             onReorder={setRankingOrder}
           />
