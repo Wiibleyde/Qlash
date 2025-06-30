@@ -1,6 +1,7 @@
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
+import { logger } from '../events/webserver';
 
 
 export const getIpAddress = (): string[] => {
@@ -38,11 +39,11 @@ export const updateBackEnv = (address: string) => {
         // Crée le fichier avec la ligne HOST si il n'existe pas
         envContent = `HOST="${address}"\n`;
         fs.writeFileSync(envFilePath, envContent, 'utf8');
-        console.log(`Created ${envFilePath} with HOST="${address}"`);
+        logger.debug(`Created ${envFilePath} with HOST="${address}"`);
         return;
     }
     fs.writeFileSync(envFilePath, envContent, 'utf8');
-    console.log(`Updated ${envFilePath} with HOST="${address}"`);
+    logger.debug(`Updated ${envFilePath} with HOST="${address}"`);
 }
 
 export const updateEnvVariable = (address: string) => {
@@ -63,10 +64,10 @@ export const updateEnvVariable = (address: string) => {
         } else {
             envContent = `${envVarName}="${address}"\n`;
             fs.writeFileSync(envFilePath, envContent, 'utf8');
-            console.log(`Created ${envFilePath} with ${envVarName}="${address}"`);
+            logger.debug(`Created ${envFilePath} with ${envVarName}="${address}"`);
             continue;
         }
         fs.writeFileSync(envFilePath, envContent, 'utf8');
-        console.log(`Updated ${envFilePath} with ${envVarName}="${address}"`);
+        logger.debug(`Updated ${envFilePath} with ${envVarName}="${address}"`);
     }
 }

@@ -11,6 +11,9 @@ import synclobby from './synclobby';
 import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config';
 import startgame from './startgame';
 import gameEvent from './game';
+import { Logger } from '../utils/logger';
+
+export const logger = new Logger();
 
 export interface IEvent {
     register: (socket: Socket) => void;
@@ -62,17 +65,17 @@ export const initServer = (port: number) => {
     });
 
     io.on('connection', (socket) => {
-        console.log('A user connected:', socket.id);
+        logger.info(`A user connected: ${socket.id}`);
 
         events.forEach(event => event.register(socket));
 
         socket.on('disconnect', () => {
-            console.log('User disconnected:', socket.id);
+            logger.info(`User disconnected: ${socket.id}`);
         });
     });
 
     server.listen(port, () => {
-        console.log(`Server is running on http://${host}:${port}`);
+        logger.info(`Server is running on http://${host}:${port}`);
     });
 
     return { app, io, server };

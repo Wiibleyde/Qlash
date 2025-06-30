@@ -3,6 +3,7 @@ import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import { generateQuiz } from '../intelligence';
 import { PrismaClient } from '@prisma/client';
+import { logger } from '../events/webserver';
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ const iaRoute: IRoute = {
                 return;
             }
 
-            console.log('Generating quiz for user:', authenticatedReq.user.id);
+            logger.debug('Generating quiz for user:', authenticatedReq.user.id);
             const quizData = req.params.prompt;
             if (!quizData) {
                 res.status(400).json({ message: 'Prompt is required' });
@@ -67,7 +68,7 @@ const iaRoute: IRoute = {
                     res.status(500).json({ message: 'Failed to generate quiz' });
                 }
             } catch (error) {
-                console.error('Error in IA quiz generation:', error);
+                logger.error('Error in IA quiz generation:', error);
                 const errorMessage = error instanceof Error ? error.message : String(error);
                 res.status(500).json({ message: 'Failed to generate quiz', error: errorMessage });
             }

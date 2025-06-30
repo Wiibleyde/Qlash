@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { logger } from '../events/webserver';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -19,9 +20,9 @@ async function main() {
             await prisma.questionType.create({
                 data: questionType
             });
-            console.log(`Created question type: ${questionType.name}`);
+            logger.info(`Created question type: ${questionType.name}`);
         } else {
-            console.log(`Question type already exists: ${questionType.name}`);
+            logger.info(`Question type already exists: ${questionType.name}`);
         }
     }
 }

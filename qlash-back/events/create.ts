@@ -1,12 +1,13 @@
 import type { Game, Player } from "../../qlash-shared/types/game";
 import { createGameCode, createGameUuid } from "../utils/game";
-import { games, type IEvent } from "./webserver";
+import { games, logger, type IEvent } from "./webserver";
 
 const create: IEvent = {
     register: (socket) => {
         socket.on("create", (data) => {
             const { username } = data;
             if (!username || username.trim() === "") {
+                logger.error("Username is required to create a game.");
                 socket.emit("create", { success: false, message: "Username is required to create a game." });
                 return;
             }
@@ -34,7 +35,7 @@ const create: IEvent = {
                 success: true,
                 gameUuid
             });
-            console.log(`User ${username} created a game with code ${gameCode}`);
+            logger.info(`Game created successfully with UUID: ${gameUuid} and code: ${gameCode}`);
         });
     },
 };

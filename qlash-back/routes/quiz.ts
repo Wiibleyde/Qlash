@@ -3,6 +3,7 @@ import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import { QuizService } from '../services/quizService';
 import { prisma } from '../database';
+import { logger } from '../events/webserver';
 
 const quizRoute: IRoute = {
     register: (app) => {
@@ -39,16 +40,16 @@ const quizRoute: IRoute = {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            console.log('Creating quiz for user:', authenticatedReq.user.id);
+            logger.info('Creating quiz for user:', authenticatedReq.user.id);
             const quizData = req.body;
-            console.log('Quiz data:', JSON.stringify(quizData, null, 2));
+            logger.debug('Quiz data:', JSON.stringify(quizData, null, 2));
 
             QuizService.createQuiz(quizData, authenticatedReq.user.id)
                 .then(createdQuiz => {
                     res.status(201).json({ message: 'Quiz created', quiz: createdQuiz });
                 })
                 .catch(error => {
-                    console.error('Error creating quiz:', error);
+                    logger.error('Error creating quiz:', error);
                     if (error.message === 'Author not found') {
                         res.status(400).json({ message: 'Invalid user' });
                     } else if (error.message.includes('Question type') && error.message.includes('not found')) {
@@ -78,7 +79,7 @@ const quizRoute: IRoute = {
                     res.status(200).json({ message: 'Quiz updated', quiz });
                 })
                 .catch(error => {
-                    console.error('Error updating quiz:', error);
+                    logger.error('Error updating quiz:', error);
                     if (error.message === 'Quiz not found' || error.message === 'Unauthorized') {
                         res.status(404).json({ message: error.message });
                     } else if (error.message.includes('Question type') && error.message.includes('not found')) {
@@ -95,7 +96,7 @@ const quizRoute: IRoute = {
                     res.status(200).json(quizzes);
                 })
                 .catch(error => {
-                    console.error('Error fetching latest quizzes:', error);
+                    logger.error('Error fetching latest quizzes:', error);
                     res.status(500).json({ message: 'Internal server error' });
                 });
         });
@@ -107,7 +108,7 @@ const quizRoute: IRoute = {
                     res.status(200).json(quizzes);
                 })
                 .catch(error => {
-                    console.error('Error fetching quizzes:', error);
+                    logger.error('Error fetching quizzes:', error);
                     res.status(500).json({ message: 'Internal server error' });
                 });
         });

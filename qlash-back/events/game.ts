@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io";
-import { games, type IEvent } from "./webserver";
 import type { Game, Player } from "../../qlash-shared/types/game";
+import { games, logger, type IEvent } from "./webserver";
 
 const TIMER = 30; // seconds
 
@@ -9,12 +9,12 @@ const timers: Record<string, NodeJS.Timeout> = {};
 const sendQuestion = (gameUuid: string, socket: Socket) => {
     const game = games.find((g: Game) => g.id === gameUuid);
     if (!game) {
-        console.error(`Game with UUID ${gameUuid} not found.`);
+        logger.error(`Game with UUID ${gameUuid} not found.`);
         return;
     }
     const index = game.currentQuestionIndex;
     game.currentQuestionStartTime = Date.now();
-    console.log(game)
+    logger.info(`Sending question for game ${gameUuid}: ${JSON.stringify(game.quiz?.questions?.[index])}`);
     const question = game.quiz?.questions?.[index];
 
     let answers = question?.options ? [...question.options] : [];
@@ -25,7 +25,7 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
     }
 
     if (!question) {
-        console.error(`End of quiz reached for game ${gameUuid}.`);
+        logger.error(`End of quiz reached for game ${gameUuid}.`);
         socket.to(gameUuid).emit("game:end", {});
         socket.emit("game:end", {});
         return;
@@ -50,6 +50,7 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
         quizLength: game.quiz?.questions?.length || 0,
         timer: TIMER,
     });
+    logger.info(`Question sent for game ${gameUuid}: ${JSON.stringify(question.content)}`);
     let timeLeft = TIMER;
     timers[gameUuid] = setInterval(() => {
         timeLeft--;
@@ -73,31 +74,31 @@ const gameEvent: IEvent = {
         });
         socket.on("game:answer", (data) => {
             const { gameUuid, answer } = data;
-            console.log("answer", data);
+            logger.debug(`Player ${socket.id} answered question in game ${gameUuid}: ${JSON.stringify(answer)}`);
             const game = games.find((g: Game) => g.id === gameUuid);
             if (!game) {
-                console.error(`Game with UUID ${gameUuid} not found.`);
+                logger.error(`Game with UUID ${gameUuid} not found.`);
                 return;
             }
             const player = game.players.find((p: Player) => p.socketId === socket.id);
             if (!player) {
-                console.error(`Player with ID ${socket.id} not found in game ${gameUuid}.`);
+                logger.error(`Player with ID ${socket.id} not found in game ${gameUuid}.`);
                 return;
             }
             if (player.isAnswered) {
-                console.warn(`Player ${player.username} has already answered.`);
+                logger.warn(`Player ${player.username} has already answered.`);
                 return;
             }
 
             const question = game.quiz?.questions?.[game.currentQuestionIndex];
             if (!question) {
-                console.error(`No question found for game ${gameUuid} at index ${game.currentQuestionIndex}.`);
+                logger.error(`No question found for game ${gameUuid} at index ${game.currentQuestionIndex}.`);
                 return;
             }
 
-            console.log(answer)
-            console.log(question.options)
-            console.log(question.type?.name)
+            logger.debug(`Player ${socket.id} answer: ${JSON.stringify(answer)}`);
+            logger.debug(`Question options: ${JSON.stringify(question.options)}`);
+            logger.debug(`Question type: ${question.type?.name}`);
 
             if (question.type?.name === "Puzzle") {
                 // answer est un tableau d'IDs dans l'ordre choisi par le joueur
@@ -113,9 +114,9 @@ const gameEvent: IEvent = {
                     const timeTaken = (Date.now() - game.currentQuestionStartTime!) / 1000;
                     const score = Math.max(0, Math.floor(1000 * (TIMER - timeTaken) / TIMER));
                     player.score += score;
-                    console.log(`Player ${player.username} a bien ordonné le puzzle ! Score: ${player.score}`);
+                    logger.info(`Player ${player.username} a bien ordonné le puzzle ! Score: ${player.score}`);
                 } else {
-                    console.log(`Player ${player.username} a mal ordonné le puzzle.`);
+                    logger.warn(`Player ${player.username} a mal ordonné le puzzle.`);
                 }
                 player.isAnswered = true;
                 socket.emit("game:answer", {});
@@ -128,14 +129,14 @@ const gameEvent: IEvent = {
                     player.score += score;
                     game.players.forEach(p => p.isAnswered = true);
                     socket.emit("game:answer", {});
-                    console.log(`Player ${player.username} a répondu correctement au buzzer ! Score: ${player.score}`);
+                    logger.info(`Player ${player.username} a répondu correctement au buzzer ! Score: ${player.score}`);
                     return;
                 } else {
                     if (timers[gameUuid]) {
                         clearInterval(timers[gameUuid]);
                     }
                     sendQuestion(gameUuid, socket);
-                    console.log(`Player ${player.username} a répondu incorrectement au buzzer, question renvoyée.`);
+                    logger.warn(`Player ${player.username} a répondu incorrectement au buzzer, question renvoyée.`);
                     return;
                 }
             }
@@ -145,7 +146,7 @@ const gameEvent: IEvent = {
             const correctAnswers = currentQuestionOptions.filter((option) => option.isCorrect).map((option) => option.id);
 
             if (!userAnswer) {
-                console.error(`Invalid answer index ${answer} for question in game ${gameUuid}.`);
+                logger.error(`Invalid answer index ${answer} for question in game ${gameUuid}.`);
                 return;
             }
             if (correctAnswers.includes(userAnswer.id)) {
@@ -154,9 +155,9 @@ const gameEvent: IEvent = {
                 // Calculate score: 1000 points max, decreasing proportionally with time
                 const score = Math.max(0, Math.floor(1000 * (TIMER - timeTaken) / TIMER));
                 player.score += score;
-                console.log(`Player ${player.username} answered correctly! Score: ${player.score}, Time taken: ${timeTaken}s`);
+                logger.info(`Player ${player.username} answered correctly! Score: ${player.score}, Time taken: ${timeTaken}s`);
             } else {
-                console.log(`Player ${player.username} answered incorrectly. Score: ${player.score}`);
+                logger.warn(`Player ${player.username} answered incorrectly. Score: ${player.score}`);
             }
 
             player.isAnswered = true;
@@ -167,7 +168,7 @@ const gameEvent: IEvent = {
             const { gameUuid } = data;
             const game = games.find((g: Game) => g.id === gameUuid);
             if (!game) {
-                console.error(`Game with UUID ${gameUuid} not found.`);
+                logger.error(`Game with UUID ${gameUuid} not found.`);
                 return;
             }
             socket.to(gameUuid).emit("game:wait", {});

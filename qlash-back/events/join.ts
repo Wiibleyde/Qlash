@@ -1,19 +1,19 @@
 import type { Player } from "../../qlash-shared/types/game";
-import { games, type IEvent } from "./webserver";
+import { games, logger, type IEvent } from "./webserver";
 
 const join: IEvent = {
     register: (socket) => {
         socket.on("join", (data) => {
             const { username, gameCode } = data;
             if (!username || username.trim() === "" || !gameCode || gameCode.length !== 6) {
-                console.error("Username is required to join a game.");
+                logger.error("Invalid username or game code.");
                 socket.emit("join", { joined: false, message: "Invalid username or game code." });
                 return;
             }
-            console.log(`User ${username} is joining game with code ${gameCode}...`);
+            logger.info(`User ${username} is joining game with code ${gameCode}...`);
             const game = games.find(g => g.code === gameCode);
             if (!game) {
-                console.error(`Game with code ${gameCode} not found.`);
+                logger.error(`Game with code ${gameCode} not found.`);
                 socket.emit("join", { joined: false, message: "Game not found." });
                 return;
             }
@@ -32,6 +32,7 @@ const join: IEvent = {
                 joined: true,
                 gameUuid: game.id,
             });
+            logger.info(`User ${username} joined game with UUID: ${game.id} and code: ${gameCode}`);
         });
     },
 }

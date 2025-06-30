@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { IRoute } from '../../qlash-shared/types/socket';
 import { authenticateToken, generateToken, type AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
+import { logger } from '../events/webserver';
 
 const authRoute: IRoute = {
     register: (app) => {
@@ -37,7 +38,7 @@ const authRoute: IRoute = {
                     res.status(409).json({ message: error.message });
                     return;
                 }
-                console.error('Registration error:', error);
+                logger.error('Registration error:', error);
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
@@ -74,7 +75,7 @@ const authRoute: IRoute = {
                     res.status(401).json({ message: error.message });
                     return;
                 }
-                console.error('Login error:', error);
+                logger.error('Login error:', error);
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
