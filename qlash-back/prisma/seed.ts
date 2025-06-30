@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { logger } from '../events/webserver';
+import { Logger } from '../utils/logger';
 const prisma = new PrismaClient();
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 async function main() {
     const questionTypes = [

@@ -3,7 +3,9 @@ import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import { generateQuiz } from '../intelligence';
 import { PrismaClient } from '@prisma/client';
-import { logger } from '../events/webserver';
+import { Logger } from '../utils/logger';
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 const prisma = new PrismaClient();
 

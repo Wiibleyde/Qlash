@@ -1,6 +1,9 @@
 import type { Socket } from "socket.io";
 import type { Game, Player } from "../../qlash-shared/types/game";
-import { games, logger, type IEvent } from "./webserver";
+import { games, type IEvent } from "./webserver";
+import { Logger } from "../utils/logger";
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 const TIMER = 30; // seconds
 

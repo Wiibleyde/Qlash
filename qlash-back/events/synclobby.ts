@@ -1,4 +1,7 @@
-import { games, logger, type IEvent } from "./webserver";
+import { games, type IEvent } from "./webserver";
+import { Logger } from "../utils/logger";
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 const synclobby: IEvent = {
     register: (socket) => {

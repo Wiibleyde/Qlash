@@ -3,8 +3,10 @@ import { LogLevel, LogLevelColors, LogLevelValues } from "../constantes/logger";
 export class Logger {
     private logFunction: (message: string) => void = console.log;
     private logLevel: number = 0;
+    private fileName: string;
 
-    constructor(logLevel: LogLevel = LogLevel.DEBUG) {
+    constructor(fileName: string, logLevel: LogLevel = LogLevel.DEBUG) {
+        this.fileName = fileName;
         this.setLogLevel(logLevel);
     }
 
@@ -23,7 +25,7 @@ export class Logger {
 
     public log(color: string, level: LogLevel, message: unknown[]): void {
         if (!this.canLog(level)) return;
-        this.logFunction(color + `[${level} ${this.getNowDate()}] : ${message.join(' ')}` + LogLevelColors.END);
+        this.logFunction(color + `[${level} ${this.getNowDate()} ${this.fileName}] : ${message.join(' ')}` + LogLevelColors.END);
     }
 
     public info(...message: unknown[]): void {

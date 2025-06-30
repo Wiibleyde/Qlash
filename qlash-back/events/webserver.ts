@@ -13,7 +13,7 @@ import startgame from './startgame';
 import gameEvent from './game';
 import { Logger } from '../utils/logger';
 
-export const logger = new Logger();
+const logger = new Logger(__filename.split('/').pop() as string);
 
 export interface IEvent {
     register: (socket: Socket) => void;

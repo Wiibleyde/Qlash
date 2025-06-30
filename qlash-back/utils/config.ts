@@ -1,8 +1,9 @@
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
-import { logger } from '../events/webserver';
+import { Logger } from './logger';
 
+const logger = new Logger(__filename.split('/').pop() as string);
 
 export const getIpAddress = (): string[] => {
     if (process.env.ISDOCKER === 'true') {

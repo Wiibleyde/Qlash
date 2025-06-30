@@ -1,6 +1,9 @@
 import { QuizService } from "../services/quizService";
 import { sendQuestion } from "./game";
-import { games, logger, type IEvent } from "./webserver";
+import { games, type IEvent } from "./webserver";
+import { Logger } from "../utils/logger";
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 const startgame: IEvent = {
     register: (socket) => {

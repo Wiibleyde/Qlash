@@ -2,7 +2,9 @@ import type { Request, Response } from 'express';
 import type { IRoute } from '../../qlash-shared/types/socket';
 import { authenticateToken, generateToken, type AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
-import { logger } from '../events/webserver';
+import { Logger } from '../utils/logger';
+
+const logger = new Logger(__filename.split('/').pop() as string);
 
 const authRoute: IRoute = {
     register: (app) => {
