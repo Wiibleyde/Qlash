@@ -5,7 +5,8 @@ async function main() {
     const questionTypes = [
         { name: 'Question à choix multiple', description: 'Une question avec plusieurs options de réponse, où l\'utilisateur peut en sélectionner une ou plusieurs.' },
         { name: 'Vrai/Faux', description: 'Une question avec deux réponses possibles : vrai ou faux.' },
-        { name: 'Puzzle', description: 'Une question qui nécessite que l\'utilisateur mette en ordre ou arrange correctement les éléments.' }
+        { name: 'Puzzle', description: 'Une question qui nécessite que l\'utilisateur mette en ordre ou arrange correctement les éléments.' },
+        { name: 'Buzzer', description: 'Une question où les utilisateurs doivent répondre rapidement en appuyant sur un buzzer.' }
     ];
 
     // Créer les questionTypes s'ils n'existent pas déjà

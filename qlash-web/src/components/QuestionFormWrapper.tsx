@@ -1,7 +1,14 @@
-import QuizForm from "./forms/QuizForm";
 import React from 'react';
+import QuizForm from "./forms/QuizForm";
 import TrueOrFalseForm from "./forms/TrueFalseForm";
 import PuzzleForm from "./forms/PuzzleForm";
+import BuzzerForm from "./forms/BuzzerForm";
+
+type Props = {
+  type: string;
+  onBack: () => void;
+  onConfirm: (data: any) => void;
+};
 
 const QuestionFormWrapper: React.FC<Props> = ({ type, onBack, onConfirm }) => {
   const handleFormSubmit = (formData: any) => {
@@ -16,6 +23,8 @@ const QuestionFormWrapper: React.FC<Props> = ({ type, onBack, onConfirm }) => {
         return <TrueOrFalseForm onSubmit={handleFormSubmit} />;
       case 'Puzzle':
         return <PuzzleForm onSubmit={handleFormSubmit} />;
+      case 'Buzzer':
+        return <BuzzerForm onSubmit={handleFormSubmit} />;
       default:
         return <p className="text-red-500">Type de question inconnu: {type}</p>;
     }

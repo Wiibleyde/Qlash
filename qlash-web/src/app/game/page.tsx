@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from "react";
 import QCMAnswerGrid from "@/components/grid/QCMAnswerGrid";
 import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
+import BuzzerAnswerGrid from "@/components/grid/BuzzerAnswerGrid";
 import { socket } from "@/utils/socket";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle";
+type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle" | "Buzzer";
 
 interface QCMAnswerOption {
   content: string;
@@ -14,7 +15,7 @@ interface QCMAnswerOption {
 const GameQuestion = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const game = searchParams.get('game');
+  const game = searchParams.get("game");
   const [timer, setTimer] = useState(30);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [rankingOrder, setRankingOrder] = useState<number[]>([]);
@@ -25,6 +26,32 @@ const GameQuestion = () => {
   const [gameEnded, setGameEnded] = useState<boolean>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [quizLength, setQuizLength] = useState<number>(0);
+  const [buzzerAnswer, setBuzzerAnswer] = useState<string>("");
+
+  const [players, setPlayers] = useState<string[]>([]); // fo afficher les noms des joueurs bb
+  const [yourScore, setYourScore] = useState(0);
+  const [hasBuzzed, setHasBuzzed] = useState(false);
+  const [buzzerAnswerInput, setBuzzerAnswerInput] = useState("");
+
+  const handleBuzz = () => {
+    if (!hasBuzzed) {
+      setHasBuzzed(true);
+      socket.emit("game:buzz", { gameUuid: game });
+    }
+  };
+
+  const handleBuzzerAnswerChange = (val: string) => {
+    setBuzzerAnswerInput(val);
+  };
+
+  const handleSubmitBuzzerAnswer = () => {
+    if (buzzerAnswerInput.trim() === "") return;
+
+    socket.emit("game:answer", { gameUuid: game, answer: buzzerAnswerInput });
+    setWaiting(true);
+    setHasBuzzed(false);
+    setBuzzerAnswerInput("");
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,23 +63,18 @@ const GameQuestion = () => {
   const questionData = {
     QCM: {
       question: "Quelle est la capitale de la France ?",
-      colors: [
-        "bg-red-500",
-        "bg-blue-500",
-        "bg-yellow-400",
-        "bg-green-500",
-      ],
+      colors: ["bg-red-500", "bg-blue-500", "bg-yellow-400", "bg-green-500"],
     },
     "Vrai/Faux": {
       question: "La Terre est plate.",
-      colors: [
-        "bg-green-500",
-        "bg-red-500",
-      ],
+      colors: ["bg-green-500", "bg-red-500"],
     },
     Puzzle: {
       question: "Classez ces villes de la plus au nord à la plus au sud :",
       options: ["Lille", "Paris", "Lyon", "Marseille"],
+    },
+    Buzzer: {
+      question: "Appuyez sur le bouton le plus vite possible quand il apparaît !",
     },
   };
 
@@ -64,7 +86,6 @@ const GameQuestion = () => {
 
   useEffect(() => {
     socket.on("game:question", ({ question, timer, questionIndex, answer, type, currentIndex, quizLength }) => {
-      console.log("Received question:", currentIndex, quizLength);
       setAnswers(question.options || []);
       setQuestion(question.content || "");
       setTimer(timer);
@@ -74,10 +95,11 @@ const GameQuestion = () => {
       setQuestionType(question.type.name);
       setCurrentQuestionIndex(currentIndex);
       setQuizLength(quizLength);
-      console.log(questionType)
-      console.log(question.type.name)
       if (type === "Puzzle") {
         setRankingOrder(Array.from({ length: question.options.length }, (_, i) => i));
+      }
+      if (type === "Buzzer") {
+        setBuzzerAnswer(question.correctAnswer || "");
       }
     });
     socket.on("game:wait", () => setWaiting(true));
@@ -92,7 +114,7 @@ const GameQuestion = () => {
     };
   }, [game, router]);
 
-  const handleAnswer = (answer: number | number[]) => {
+  const handleAnswer = (answer: number | number[] | string) => {
     if (questionType === "Puzzle") {
       socket.emit("game:answer", { gameUuid: game, answer: rankingOrder });
     } else {
@@ -104,11 +126,7 @@ const GameQuestion = () => {
 
   const renderAnswers = () => {
     if (waiting) {
-      return (
-        <div className="text-xl font-semibold mt-8">
-          En attente des autres réponses...
-        </div>
-      );
+      return <div className="text-xl font-semibold mt-8">En attente des autres réponses...</div>;
     }
 
     if (questionType === "Question à choix multiple" || questionType === "Vrai/Faux") {
@@ -125,7 +143,7 @@ const GameQuestion = () => {
       return (
         <>
           <PuzzleAnswerGrid
-            options={answers.length ? answers.map(a => a.content) : questionData.Puzzle.options}
+            options={answers.length ? answers.map((a) => a.content) : questionData.Puzzle.options}
             selectedOrder={rankingOrder}
             onReorder={setRankingOrder}
           />
@@ -138,6 +156,23 @@ const GameQuestion = () => {
         </>
       );
     }
+
+    if (questionType === "Buzzer") {
+      return (
+        <>
+          <BuzzerAnswerGrid
+            players={players}
+            yourScore={yourScore}
+            onBuzz={handleBuzz}
+            isBuzzed={hasBuzzed}
+            buzzerAnswer={buzzerAnswerInput}
+            onAnswerChange={handleBuzzerAnswerChange}
+            onSubmitAnswer={handleSubmitBuzzerAnswer}
+          />
+        </>
+      );
+    }
+
 
     return null;
   };

@@ -14,6 +14,7 @@ const allQuestionTypes = [
   'Question à choix multiple',
   'Vrai/Faux',
   'Puzzle',
+  'Buzzer'
 ];
 
 const LobbyCreate = () => {
@@ -68,7 +69,9 @@ const LobbyCreate = () => {
     options?: string[];
     correctAnswer?: string;
   }) => {
-    const newQuestion: Omit<IQuestion, 'id' | 'quizId' | 'typeId' | 'createdAt' | 'updatedAt'> = {
+    const newQuestion: IQuestion = {
+      id: '',
+      quizId: '',
       content: formData.question,
       type: {
         id: '',
@@ -77,20 +80,32 @@ const LobbyCreate = () => {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      options: formData.options?.map((opt, index) => ({
-        id: '',
-        questionId: '',
-        content: opt,
-        isCorrect: opt === formData.correctAnswer,
-        order: index,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }))
+      options: formData.type === 'Buzzer' 
+        ? [{
+            id: '',
+            questionId: '',
+            content: formData.correctAnswer || '',
+            isCorrect: true,
+            order: 0,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }]
+        : formData.options?.map((opt, index) => ({
+            id: '',
+            questionId: '',
+            content: opt,
+            isCorrect: opt === formData.correctAnswer,
+            order: index,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })) || [],
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     setQuiz(prev => ({
       ...prev,
-      questions: [...(prev.questions || []), newQuestion as IQuestion]
+      questions: [...(prev.questions || []), newQuestion]
     }));
 
     setStep('list');
@@ -113,8 +128,6 @@ const LobbyCreate = () => {
       const token = localStorage.getItem('token');
       const method = quiz.id ? 'PUT' : 'POST';
       const url = quiz.id ? `${createQuizApiUrl}/${quiz.id}` : createQuizApiUrl;
-      console.log('Saving quiz:', method, url, quiz);
-
       const response = await fetch(url, {
         method,
         headers: {
@@ -126,12 +139,9 @@ const LobbyCreate = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Quiz sauvegardé:', result);
-
         if (!quiz.id && result.quiz) {
           setQuiz(result.quiz);
         }
-
         alert(quiz.id ? 'Quiz mis à jour avec succès!' : 'Quiz créé avec succès!');
       } else {
         const errorData = await response.json();
@@ -159,14 +169,9 @@ const LobbyCreate = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Quiz IA créé:', result);
-
-        // Update quiz state with AI-generated data
         if (result.quiz) {
-          // If the API returns a complete quiz object
           setQuiz(result.quiz);
         } else if (result.questions) {
-          // If the API returns just questions
           setQuiz(prev => ({
             ...prev,
             name: prev.name || `Quiz IA - ${prompt}`,
@@ -174,7 +179,6 @@ const LobbyCreate = () => {
             questions: result.questions
           }));
         } else if (result.name || result.questions) {
-          // If the result is the quiz object directly
           setQuiz(prev => ({
             ...prev,
             ...result,
@@ -199,7 +203,6 @@ const LobbyCreate = () => {
   return (
     <div className="min-h-screen bg-white text-white flex flex-col">
       <Navbar />
-
       <div className="flex flex-1 p-6 md:p-10 gap-8 mt-20">
         <div className="flex-1 bg-white text-black rounded-3xl p-6 shadow-2xl flex flex-col justify-between relative">
           {step === 'list' && (
@@ -208,7 +211,6 @@ const LobbyCreate = () => {
                 <h2 className="text-2xl font-extrabold mb-4 text-purple-700">
                   {quiz.id ? 'Modifier le Quiz' : 'Créer un Quiz'}
                 </h2>
-
                 <div className="mb-6 space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -222,7 +224,6 @@ const LobbyCreate = () => {
                       placeholder="Entrez le nom du quiz"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Description
@@ -236,7 +237,6 @@ const LobbyCreate = () => {
                     />
                   </div>
                 </div>
-
                 <h3 className="text-xl font-bold mb-4 text-purple-700">Questions</h3>
                 {quiz.questions?.length === 0 ? (
                   <p className="text-gray-400 italic">Aucune question ajoutée</p>
@@ -246,7 +246,10 @@ const LobbyCreate = () => {
                       <li key={idx} className="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl shadow space-y-1">
                         <div><strong>Type:</strong> {q.type?.name}</div>
                         <div><strong>Question:</strong> {q.content}</div>
-                        {q.options && (
+                        {q.type?.name === 'Buzzer' && (
+                          <div><strong>Réponse correcte:</strong> {q.options?.[0]?.content || 'Non renseignée'}</div>
+                        )}
+                        {q.type?.name !== 'Buzzer' && q.options && q.options.length > 0 && (
                           <ul className="pl-4 list-disc">
                             {q.options.map((opt: IOption, i: number) => (
                               <li key={i} className={opt.isCorrect ? 'font-bold underline' : ''}>
@@ -260,7 +263,6 @@ const LobbyCreate = () => {
                   </ul>
                 )}
               </div>
-
               <div className="flex justify-between gap-4">
                 <div className="w-1/2">
                   <Button
@@ -277,14 +279,12 @@ const LobbyCreate = () => {
               </div>
             </>
           )}
-
           {step === 'choose' && (
             <>
               <div>
                 <h2 className="text-2xl font-extrabold mb-4 text-purple-700">Choisissez un type de question</h2>
                 <QuestionSelector types={availableTypes} onSelect={handleSelectType} />
               </div>
-
               <div className="flex justify-end">
                 <div className="w-1/3">
                   <Button onClick={handleCancel}>❌ Annuler</Button>
@@ -292,7 +292,6 @@ const LobbyCreate = () => {
               </div>
             </>
           )}
-
           {step === 'form' && selectedType && (
             <>
               <div>
@@ -303,7 +302,6 @@ const LobbyCreate = () => {
                   onConfirm={handleConfirmAdd}
                 />
               </div>
-
               <div className="flex justify-end">
                 <div className="w-1/3">
                   <Button onClick={handleCancel}>❌ Annuler</Button>
