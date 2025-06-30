@@ -20,10 +20,22 @@ export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
                     parts: [
                         {
                             text: `Generate a quiz with 5 questions based on the following prompt: ${prompt}. 
-                            Return a JSON object with a 'questions' array. Each question should have:
+                            Return a JSON object with:
+                            - name: a catchy title for the quiz
+                            - description: a brief description of the quiz
+                            - questions: array of question objects
+                            
+                            Each question should have:
                             - content: the question text
+                            - type: one of these exact values: "Question à choix multiple", "Vrai/Faux", or "Puzzle"
                             - options: array of option objects with 'content' and 'isCorrect' properties
-                            - Ensure only one option per question has isCorrect: true`
+                            
+                            Rules:
+                            - For "Question à choix multiple": 4 options, only one correct
+                            - For "Vrai/Faux": exactly 2 options ("Vrai" and "Faux"), only one correct
+                            - For "Puzzle": 3-4 options representing elements to order, mark the first element as correct
+                            - Ensure only one option per question has isCorrect: true
+                            - Vary the question types across the 5 questions`
                         }
                     ],
                 }
@@ -34,12 +46,15 @@ export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
                 responseJsonSchema: {
                     type: Type.OBJECT,
                     properties: {
+                        name: { type: Type.STRING },
+                        description: { type: Type.STRING },
                         questions: {
                             type: Type.ARRAY,
                             items: {
                                 type: Type.OBJECT,
                                 properties: {
                                     content: { type: Type.STRING },
+                                    type: { type: Type.STRING },
                                     options: {
                                         type: Type.ARRAY,
                                         items: {
@@ -52,11 +67,11 @@ export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
                                         }
                                     }
                                 },
-                                required: ["content", "options"]
+                                required: ["content", "type", "options"]
                             }
                         }
                     },
-                    required: ["questions"]
+                    required: ["name", "description", "questions"]
                 }
             }
         });
