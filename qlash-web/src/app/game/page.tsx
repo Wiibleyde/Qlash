@@ -33,7 +33,7 @@ const GameQuestion = () => {
   const [quizLength, setQuizLength] = useState<number>(0);
   const [buzzerAnswer, setBuzzerAnswer] = useState<string>("");
 
-  const [players, setPlayers] = useState<Player[]>([]); // fo afficher les noms des joueurs bb
+  const [players, setPlayers] = useState<Player[]>([]);
   const [yourScore, setYourScore] = useState(0);
   const [hasBuzzed, setHasBuzzed] = useState(false);
   const [buzzerAnswerInput, setBuzzerAnswerInput] = useState("");
@@ -161,6 +161,30 @@ const GameQuestion = () => {
 
     return null;
   };
+
+  if (questionType === "Buzzer" && !waiting) {
+    return (
+      <>
+        <div className="fixed inset-0 z-50 bg-transparent text-black pointer-events-none">
+          <div className="fixed top-4 right-6 text-2xl font-bold bg-white px-4 py-2 rounded-full shadow-lg pointer-events-auto">
+            {timer}s
+          </div>
+
+          <h1 className="text-3xl text-white md:text-4xl lg:text-5xl font-extrabold text-center mt-20 px-4 pointer-events-auto">
+            {question}
+          </h1>
+
+          <div className="fixed bottom-4 right-6 text-2xl font-bold bg-white px-4 py-2 rounded-full shadow-lg pointer-events-auto">
+            {`Question ${currentQuestionIndex} / ${quizLength}`}
+          </div>
+        </div>
+
+        <div className="bg-white">
+          {renderAnswers()}
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-around bg-white text-black px-4 py-6 relative">
