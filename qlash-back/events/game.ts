@@ -38,6 +38,11 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
     });
 
     socket.to(gameUuid).emit("game:question", {
+        players: game.players.map((p: Player) => ({
+            username: p.username,
+            socketId: p.socketId,
+            score: p.score
+        })),
         questionIndex: index,
         question,
         answers,
@@ -46,6 +51,11 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
         timer: TIMER,
     });
     socket.emit("game:question", {
+        players: game.players.map((p: Player) => ({
+            username: p.username,
+            socketId: p.socketId,
+            score: p.score
+        })),
         questionIndex: index,
         question,
         answers,
@@ -174,7 +184,11 @@ const gameEvent: IEvent = {
                 logger.error(`Game with UUID ${gameUuid} not found.`);
                 return;
             }
-            socket.to(gameUuid).emit("game:wait", {});
+            socket.to(gameUuid).emit("game:buzzer:wait", {
+                player: {
+                    username: game.players.find((p: Player) => p.socketId === socket.id)?.username || "Unknown",
+                },
+            });
         });
     }
 }

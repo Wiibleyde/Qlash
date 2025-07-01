@@ -1,12 +1,13 @@
 import React from "react";
 
 interface Player {
-  name: string;
+  username: string;
   score: number;
 }
 
 interface BuzzerProps {
   players: Player[];
+  playersBuzzed: string;
   yourScore: number;
   onBuzz: () => void;
   isBuzzed: boolean;
@@ -32,7 +33,7 @@ const BuzzerAnswerGrid: React.FC<BuzzerProps> = ({
             key={index}
             className={`flex flex-col items-center text-white ${index === 0 || index === 3 ? "mt-6" : ""}`}
           >
-            <p className="text-lg font-bold mb-1">{player.name}</p>
+            <p className="text-lg font-bold mb-1">{player.username}</p>
             <div
               className="bg-[#c3b6fe] text-black text-center w-24 h-4 flex items-center justify-center font-bold text-lg shadow-lg"
               style={{
