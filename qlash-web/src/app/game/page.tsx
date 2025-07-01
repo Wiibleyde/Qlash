@@ -154,6 +154,7 @@ const GameQuestion = () => {
             buzzerAnswer={buzzerAnswerInput}
             onAnswerChange={handleBuzzerAnswerChange}
             onSubmitAnswer={handleSubmitBuzzerAnswer}
+            socketId={socket.id}
           />
         </>
       );
