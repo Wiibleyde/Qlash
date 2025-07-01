@@ -1,13 +1,13 @@
+import { findGameBySocketId } from "../helpers/game";
 import { Logger } from "../utils/logger";
-import { games, type IEvent } from "./webserver";
+import { type IEvent } from "./webserver";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
-
 const disconnect: IEvent = {
     register: (socket) => {
-        socket.on("disconnect", () => {            
-            const game = games.find(g => g.players.some(player => player.socketId === socket.id));
+        socket.on("disconnect", () => {         
+            const game = findGameBySocketId(socket.id);   
             if (!game) {
                 logger.warn(`No game found for socket ${socket.id}`);
                 return;

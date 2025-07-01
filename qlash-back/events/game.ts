@@ -1,7 +1,8 @@
 import type { Socket } from "socket.io";
-import type { Game, Player } from "../../qlash-shared/types/game";
-import { games, type IEvent } from "./webserver";
+import type { Player } from "../../qlash-shared/types/game";
+import { findGameById } from "../helpers/game";
 import { Logger } from "../utils/logger";
+import { type IEvent } from "./webserver";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -10,7 +11,7 @@ const TIMER = 30; // seconds
 const timers: Record<string, NodeJS.Timeout> = {};
 
 const sendQuestion = (gameUuid: string, socket: Socket) => {
-    const game = games.find((g: Game) => g.id === gameUuid);
+    const game = findGameById(gameUuid);
     if (!game) {
         logger.error(`Game with UUID ${gameUuid} not found.`);
         return;
@@ -88,7 +89,7 @@ const gameEvent: IEvent = {
         socket.on("game:answer", (data) => {
             const { gameUuid, answer } = data;
             logger.debug(`Player ${socket.id} answered question in game ${gameUuid}: ${JSON.stringify(answer)}`);
-            const game = games.find((g: Game) => g.id === gameUuid);
+            const game = findGameById(gameUuid);
             if (!game) {
                 logger.error(`Game with UUID ${gameUuid} not found.`);
                 return;
@@ -179,7 +180,7 @@ const gameEvent: IEvent = {
 
         socket.on("game:buzzed", (data) => {
             const { gameUuid } = data;
-            const game = games.find((g: Game) => g.id === gameUuid);
+            const game = findGameById(gameUuid);
             if (!game) {
                 logger.error(`Game with UUID ${gameUuid} not found.`);
                 return;

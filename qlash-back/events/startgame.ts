@@ -2,6 +2,7 @@ import { QuizService } from "../services/quizService";
 import { sendQuestion } from "./game";
 import { games, type IEvent } from "./webserver";
 import { Logger } from "../utils/logger";
+import { findGameById } from "../helpers/game";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -18,7 +19,7 @@ const startgame: IEvent = {
                 socket.emit("startgame", { success: false, message: "You are not the host." });
                 return;
             }
-            const game = games.find(g => g.id === gameUuid);
+            const game = findGameById(gameUuid);
             if (!game) {
                 logger.error(`Game with UUID ${gameUuid} not found.`);
                 socket.emit("startgame", { success: false, message: "Game not found." });
