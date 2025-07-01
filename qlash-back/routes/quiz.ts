@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
-import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import { QuizService } from '../services/quizService';
 import { prisma } from '../database';
 import { Logger } from '../utils/logger';
+import type { IRoute } from '../../qlash-shared/types/socket';
 
 const logger = new Logger(__filename.split('/').pop() as string);
 

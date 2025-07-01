@@ -1,9 +1,9 @@
 import type { Express } from 'express';
-import type { IRoute } from "../../qlash-shared/types/socket";
 import { authenticateToken, type AuthenticatedRequest } from "../middleware/auth";
 import { generateQuiz } from '../intelligence';
 import { PrismaClient } from '@prisma/client';
 import { Logger } from '../utils/logger';
+import type { IRoute } from '../../qlash-shared/types/socket';
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -27,14 +27,12 @@ const iaRoute: IRoute = {
             }
 
             try {
-                // Get question types from database
                 const questionTypes = await prisma.questionType.findMany();
                 const typeMap = new Map(questionTypes.map(type => [type.name, type]));
 
                 const generatedQuiz = await generateQuiz(quizData);
 
                 if (generatedQuiz && generatedQuiz.questions) {
-                    // Transform the generated quiz to match our database structure
                     const transformedQuiz = {
                         name: generatedQuiz.name,
                         description: generatedQuiz.description,

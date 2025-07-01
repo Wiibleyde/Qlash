@@ -8,7 +8,6 @@ const logger = new Logger(__filename.split('/').pop() as string);
 
 const authRoute: IRoute = {
     register: (app) => {
-        // Route d'inscription
         app.post('/auth/register', async (req: Request, res: Response) => {
             try {
                 if (!req.body) {
@@ -45,7 +44,6 @@ const authRoute: IRoute = {
             }
         });
 
-        // Route de connexion
         app.post('/auth/login', async (req: Request, res: Response) => {
             try {
                 if (!req.body) {

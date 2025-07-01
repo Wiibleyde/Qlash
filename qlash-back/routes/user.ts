@@ -38,7 +38,7 @@ const userRoute: IRoute = {
             if (!id) {
                 return res.status(400).json({ message: 'User ID is required' });
             }
-            const updateData = req.body; // Assuming the body contains the fields to update
+            const updateData = req.body;
             const updatedUser = UserService.updateUser(id, updateData);
             if (!updatedUser) {
                 return res.status(404).json({ message: 'User not found' });

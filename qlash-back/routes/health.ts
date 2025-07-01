@@ -16,7 +16,6 @@ const healthRoute: IRoute = {
             });
         });
 
-        // Route protégée pour vérifier le statut de connexion
         app.get('/health/account', authenticateToken, (req, res) => {
             const authenticatedReq = req as AuthenticatedRequest;
             res.json({
