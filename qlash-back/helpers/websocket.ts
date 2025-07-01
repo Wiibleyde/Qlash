@@ -6,3 +6,8 @@ export const sendError = (socket: Socket, event: string, message: string) => {
         message,
     });
 }
+
+export const sendToRoom = (socket: Socket, roomId: string, event: string, data: any) => {
+    socket.to(roomId).emit(event, data);
+    socket.emit(event, data);
+}

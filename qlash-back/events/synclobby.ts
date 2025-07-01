@@ -1,5 +1,5 @@
 import { findGameById } from "../helpers/game";
-import { sendError } from "../helpers/websocket";
+import { sendError, sendToRoom } from "../helpers/websocket";
 import { Logger } from "../utils/logger";
 import { type IEvent } from "./webserver";
 
@@ -24,12 +24,7 @@ const synclobby: IEvent = {
                     socketId: player.socketId,
                     isHost: player.isHost,
                 }));
-                socket.to(gameUuid).emit("synclobby", {
-                    success: true,
-                    players: playersData,
-                    gameCode: game.code,
-                });
-                socket.emit("synclobby", {
+                sendToRoom(socket, gameUuid, "synclobby", {
                     success: true,
                     players: playersData,
                     gameCode: game.code,

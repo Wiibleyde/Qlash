@@ -3,6 +3,7 @@ import type { Player } from "../../qlash-shared/types/game";
 import { findGameById } from "../helpers/game";
 import { Logger } from "../utils/logger";
 import { type IEvent } from "./webserver";
+import { sendToRoom } from "../helpers/websocket";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -30,28 +31,14 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
 
     if (!question) {
         logger.error(`End of quiz reached for game ${gameUuid}.`);
-        socket.to(gameUuid).emit("game:end", {});
-        socket.emit("game:end", {});
+        sendToRoom(socket, gameUuid, "game:end", {});
         return;
     }
     game.players.forEach((player) => {
         player.isAnswered = false;
     });
 
-    socket.to(gameUuid).emit("game:question", {
-        players: game.players.map((p: Player) => ({
-            username: p.username,
-            socketId: p.socketId,
-            score: p.score
-        })),
-        questionIndex: index,
-        question,
-        answers,
-        currentIndex: game.currentQuestionIndex + 1,
-        quizLength: game.quiz?.questions?.length || 0,
-        timer: TIMER,
-    });
-    socket.emit("game:question", {
+    sendToRoom(socket, gameUuid, "game:question", {
         players: game.players.map((p: Player) => ({
             username: p.username,
             socketId: p.socketId,
@@ -71,8 +58,7 @@ const sendQuestion = (gameUuid: string, socket: Socket) => {
         if (timeLeft <= 0 || game.players.every((p) => p.isAnswered)) {
             clearInterval(timers[gameUuid]);
 
-            socket.to(gameUuid).emit("game:wait", {});
-            socket.emit("game:wait", {});
+            sendToRoom(socket, gameUuid, "game:wait", {});
             setTimeout(() => {
                 game.currentQuestionIndex++;
                 sendQuestion(gameUuid, socket);

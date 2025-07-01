@@ -3,7 +3,7 @@ import { sendQuestion } from "./game";
 import { games, type IEvent } from "./webserver";
 import { Logger } from "../utils/logger";
 import { findGameById } from "../helpers/game";
-import { sendError } from "../helpers/websocket";
+import { sendError, sendToRoom } from "../helpers/websocket";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -45,18 +45,12 @@ const startgame: IEvent = {
                 sendError(socket, "startgame", "Error fetching quiz.");
                 return;
             }
-            socket.to(gameUuid).emit("startgame", {
+            sendToRoom(socket, gameUuid, "startgame", {
                 success: true,
                 message: "Game is starting.",
-                gameId: game.id
-            });
-            socket.emit("startgame", {
-                success: true,
-                message: "Game is starting.",
-                gameId: game.id
+                gameId: game.id,
             });
             logger.info(`Game ${game.id} started with quiz ${selectedQuiz.id}.`);
-
             setTimeout(() => {
                 sendQuestion(gameUuid, socket);
             }, 2000);

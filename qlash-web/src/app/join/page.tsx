@@ -26,6 +26,7 @@ const Join = () => {
   useEffect(() => {
     socket.on("join", (data) => {
       const { success, gameUuid, message } = data;
+      console.log("Join response:", data);
       if (success) {
         router.push(`/lobby?game=${gameUuid}`);
         // Redirect to game page or update UI accordingly

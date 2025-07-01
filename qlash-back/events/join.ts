@@ -34,7 +34,7 @@ const join: IEvent = {
             socket.join(game.id);
             socket.to(game.id).emit("synclobby");
             socket.emit("join", {
-                joined: true,
+                success: true,
                 gameUuid: game.id,
             });
             logger.info(`User ${username} joined game with UUID: ${game.id} and code: ${gameCode}`);
