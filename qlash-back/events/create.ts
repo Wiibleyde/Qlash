@@ -1,4 +1,5 @@
 import type { Game, Player } from "../../qlash-shared/types/game";
+import { sendError } from "../helpers/websocket";
 import { createGameCode, createGameUuid } from "../utils/game";
 import { Logger } from "../utils/logger";
 import { games, type IEvent } from "./webserver";
@@ -11,7 +12,7 @@ const create: IEvent = {
             const { username } = data;
             if (!username || username.trim() === "") {
                 logger.error("Username is required to create a game.");
-                socket.emit("create", { success: false, message: "Username is required to create a game." });
+                sendError(socket, "create", "Username is required to create a game.");
                 return;
             }
             const gameCode = createGameCode();

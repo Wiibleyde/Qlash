@@ -1,4 +1,5 @@
 import { findGameById } from "../helpers/game";
+import { sendError } from "../helpers/websocket";
 import { Logger } from "../utils/logger";
 import { type IEvent } from "./webserver";
 
@@ -15,7 +16,7 @@ const synclobby: IEvent = {
                 const playerExists = game.players.some(player => player.socketId === socket.id);
                 if (!playerExists) {
                     logger.error(`Player with socket ID ${socket.id} not found in game ${gameUuid}.`);
-                    socket.emit("synclobby", { success: false, message: "Player not found in game." });
+                    sendError(socket, "synclobby", "Player not found in game.");
                     return;
                 }
                 const playersData = game.players.map(player => ({
@@ -35,7 +36,7 @@ const synclobby: IEvent = {
                 });
             } else {
                 logger.error(`Game with UUID ${gameUuid} not found.`);
-                socket.emit("synclobby", { success: false, message: "Game not found." });
+                sendError(socket, "synclobby", "Game not found.");
             }
         });
     }
