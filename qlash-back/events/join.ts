@@ -1,5 +1,6 @@
 import type { Player } from "../../qlash-shared/types/game";
 import { findGameByCode } from "../helpers/game";
+import { sendError } from "../helpers/websocket";
 import { Logger } from "../utils/logger";
 import { type IEvent } from "./webserver";
 
@@ -11,14 +12,14 @@ const join: IEvent = {
             const { username, gameCode } = data;
             if (!username || username.trim() === "" || !gameCode || gameCode.length !== 6) {
                 logger.error("Invalid username or game code.");
-                socket.emit("join", { joined: false, message: "Invalid username or game code." });
+                sendError(socket, "join", "Invalid username or game code.");
                 return;
             }
             logger.info(`User ${username} is joining game with code ${gameCode}...`);
             const game = findGameByCode(gameCode);
             if (!game) {
                 logger.error(`Game with code ${gameCode} not found.`);
-                socket.emit("join", { joined: false, message: "Game not found." });
+                sendError(socket, "join", "Game not found.");
                 return;
             }
             const player: Player = {
