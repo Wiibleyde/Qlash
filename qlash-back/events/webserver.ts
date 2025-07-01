@@ -3,31 +3,17 @@ import express from 'express';
 import { createServer } from 'http';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
+import events from '.';
 import type { Game } from '../../qlash-shared/types/game';
 import { registerRoutes } from '../routes';
-import create from './create';
-import join from './join';
-import synclobby from './synclobby';
 import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config';
-import startgame from './startgame';
-import gameEvent from './game';
 import { Logger } from '../utils/logger';
-import disconnect from './disconnect';
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
 export interface IEvent {
     register: (socket: Socket) => void;
 }
-
-const events: IEvent[] = [
-    join,
-    create,
-    synclobby,
-    startgame,
-    gameEvent,
-    disconnect
-];
 
 export const games: Game[] = [];
 
