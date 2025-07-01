@@ -1,11 +1,9 @@
-import cors from 'cors';
-import express from 'express';
 import { createServer } from 'http';
 import type { Socket } from 'socket.io';
-import { Server } from 'socket.io';
 import events from '.';
 import type { Game } from '../../qlash-shared/types/game';
 import { registerRoutes } from '../routes';
+import { app, io, server } from '../server';
 import { getIpAddress, updateBackEnv, updateEnvVariable } from '../utils/config';
 import { Logger } from '../utils/logger';
 
@@ -25,32 +23,8 @@ export const initServer = (port: number) => {
 
     const host = process.env.HOST
 
-    const app = express();
-
-    // Middleware Express
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-    app.use(cors({
-        origin: '*',
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    }));
-
     // Register all routes
     registerRoutes(app);
-
-    // Créer le serveur HTTP avec Express
-    const server = createServer(app);
-
-    const io = new Server(server, {
-        cors: {
-            origin: "*",
-            methods: ["GET", "POST"],
-            allowedHeaders: ["Content-Type"],
-            credentials: true,
-        },
-    });
 
     io.on('connection', (socket) => {
         logger.info(`A user connected: ${socket.id}`);
@@ -61,6 +35,4 @@ export const initServer = (port: number) => {
     server.listen(port, () => {
         logger.info(`Server is running on http://${host}:${port}`);
     });
-
-    return { app, io, server };
 }
