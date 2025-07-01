@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Player from '@/components/ui/scoreboard/player';
 import Button from '@/components/ui/Button';
 
 export default function Scoreboard() {
+    const [isFinished, setIsFinished] = useState(false);
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Scoreboard</Text>
@@ -21,12 +23,24 @@ export default function Scoreboard() {
                 </ScrollView>
 
                 <View style={styles.buttonContainer}>
-                    <Button
-                        action={() => {}}
-                        text="Next"
-                        variants="secondary"
-                        disabled={false}
-                    />
+                    {isFinished ? (
+                        <Button
+                            action={() => {
+                                // Handle restart action
+                                setIsFinished(false);
+                            }}
+                            text="Finished!"
+                            variants="secondary"
+                            disabled={false}
+                        />
+                    ) : (
+                        <Button
+                            action={() => {}}
+                            text="Next"
+                            variants="secondary"
+                            disabled={false}
+                        />
+                    )}
                 </View>
             </View>
         </View>
