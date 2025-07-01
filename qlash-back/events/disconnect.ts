@@ -1,5 +1,4 @@
 import { Logger } from "../utils/logger";
-import synclobby from "./synclobby";
 import { games, type IEvent } from "./webserver";
 
 const logger = new Logger(__filename.split('/').pop() as string);
