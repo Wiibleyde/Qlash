@@ -20,7 +20,7 @@ const Lobby = () => {
   const [code, setCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState<boolean>(false);
 
-  const [selectedPresets, setSelectedPresets] = useState<string[]>([]);
+  const [selectedPresets, setSelectedPresets] = useState<{ id: string; name: string }[]>([]);
   const [selectingPreset, setSelectingPreset] = useState(false);
 
   const [quizPresets, setQuizPresets] = useState<{ id: string; name: string }[]>([]);
@@ -36,7 +36,7 @@ const Lobby = () => {
   };
 
   const handleStartGame = () => {
-    socket.emit("startgame", { gameUuid: game, selectedQuiz: quizPresets[0] });
+    socket.emit("startgame", { gameUuid: game, selectedQuiz: selectedPresets[0] });
   }
 
   useEffect(() => {
@@ -88,16 +88,17 @@ const Lobby = () => {
     fetchQuizzes();
   }, []);
 
-  const handleAddPreset = (preset: string) => {
-    if (!selectedPresets.includes(preset)) {
-      setSelectedPresets(prev => [...prev, preset]);
+  const handleAddPreset = (presetId: string) => {
+    const preset = quizPresets.find(q => q.id === presetId);
+    if (preset && !selectedPresets.some(p => p.id === presetId)) {
+      setSelectedPresets(prev => [...prev, { id: preset.id, name: preset.name }]);
     }
     setSelectingPreset(false);
   };
 
-  const handleRemovePreset = (preset: string) => {
-    setSelectedPresets(prev => prev.filter(p => p !== preset));
-  };
+  const handleRemovePreset = (presetId: string) => {
+  setSelectedPresets(prev => prev.filter(p => p.id !== presetId));
+};
 
   return (
     <div className="min-h-screen bg-white text-white flex flex-col">
@@ -120,8 +121,8 @@ const Lobby = () => {
                           key={idx}
                           className="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl shadow flex justify-between items-center"
                         >
-                          <span>{preset}</span>
-                          <button onClick={() => handleRemovePreset(preset)} className="text-red-500 text-sm font-bold">
+                          <span>{preset.name}</span>
+                          <button onClick={() => handleRemovePreset(preset.id)} className="text-red-500 text-sm font-bold">
                             ✕
                           </button>
                         </li>
@@ -144,7 +145,7 @@ const Lobby = () => {
                     <p className="text-gray-400 italic">Chargement des quizz...</p>
                   ) : (
                     <PresetSelector
-                      presets={quizPresets.map(q => q.name)}
+                      presets={quizPresets}
                       onSelect={handleAddPreset}
                     />
                   )}
@@ -182,7 +183,7 @@ const Lobby = () => {
               </div>
             </div>
 
-            <Button onClick={handleStartGame}>
+            <Button onClick={handleStartGame} disabled={selectedPresets.length === 0}>
               🚀 Démarrer la partie
             </Button>
           </div>

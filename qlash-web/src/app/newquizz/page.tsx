@@ -240,8 +240,10 @@ const LobbyCreate = () => {
                     />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-purple-700">Questions</h3>
-                {quiz.questions?.length === 0 ? (
+                {!showIaPromptInput ? (
+                  <h3 className="text-xl font-bold mb-4 text-purple-700">Questions</h3>
+                ) : null}
+                {quiz.questions?.length === 0 && !showIaPromptInput ? (
                   <p className="text-gray-400 italic">Aucune question ajoutée</p>
                 ) : (
                   <ul className="space-y-2 mb-6">

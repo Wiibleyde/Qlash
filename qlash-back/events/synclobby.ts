@@ -1,5 +1,6 @@
-import { games, type IEvent } from "./webserver";
+import { findGameById } from "../helpers/game";
 import { Logger } from "../utils/logger";
+import { type IEvent } from "./webserver";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -9,7 +10,7 @@ const synclobby: IEvent = {
             logger.debug(`User with socket ID ${socket.id} requested to sync lobby., ${JSON.stringify(data)}`);
             const { gameUuid } = data;
             logger.info(`Game UUID: ${gameUuid}`);
-            const game = games.find(g => g.id === gameUuid);
+            const game = findGameById(gameUuid);
             if (game) {
                 const playerExists = game.players.some(player => player.socketId === socket.id);
                 if (!playerExists) {

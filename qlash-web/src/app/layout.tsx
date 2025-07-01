@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${nunito.className} antialiased`}
+        className={`${nunito.className} antialiased bg-white`}
         cz-shortcut-listen="true"
       >
         <Toaster />

@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory, Type } from "@google/genai";
 import type { IQuiz } from "../qlash-shared/types/quiz";
 
 export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
@@ -41,6 +41,29 @@ export async function generateQuiz(prompt: string): Promise<IQuiz | null> {
                 }
             ],
             config: {
+                // tools: [{ googleSearch: {} }], // Not compatible with json output
+                safetySettings: [
+                    {
+                        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                        threshold: HarmBlockThreshold.BLOCK_NONE,
+                    },
+                    {
+                        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                        threshold: HarmBlockThreshold.BLOCK_NONE,
+                    },
+                    {
+                        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                        threshold: HarmBlockThreshold.BLOCK_NONE,
+                    },
+                    {
+                        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                        threshold: HarmBlockThreshold.BLOCK_NONE,
+                    },
+                    {
+                        category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                        threshold: HarmBlockThreshold.BLOCK_NONE,
+                    },
+                ],
                 responseMimeType: "application/json",
                 temperature: 0.7,
                 responseJsonSchema: {
