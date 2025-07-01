@@ -5,6 +5,7 @@ import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
 import BuzzerAnswerGrid from "@/components/grid/BuzzerAnswerGrid";
 import { socket } from "@/utils/socket";
 import { useRouter, useSearchParams } from "next/navigation";
+import Loading from "@/components/Loading";
 
 type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle" | "Buzzer";
 
@@ -111,7 +112,7 @@ const GameQuestion = () => {
 
   const renderAnswers = () => {
     if (waiting) {
-      return <div className="text-xl font-semibold mt-8">En attente des autres réponses...</div>;
+      return <Loading />;
     }
 
     if (questionType === "Question à choix multiple" || questionType === "Vrai/Faux") {
@@ -154,7 +155,7 @@ const GameQuestion = () => {
             buzzerAnswer={buzzerAnswerInput}
             onAnswerChange={handleBuzzerAnswerChange}
             onSubmitAnswer={handleSubmitBuzzerAnswer}
-            socketId={socket.id}
+            socketId={socket.id as string}
           />
         </>
       );
