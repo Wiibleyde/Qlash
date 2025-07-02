@@ -11,8 +11,21 @@ const getButtonStyle = (variants: string) => {
             return styles.buttonPrimaryDisabled;
         case 'secondaryDisabled':
             return styles.buttonSecondaryDisabled;
+        case 'buzzer':
+            return styles.buzzerButton;
         default:
             return styles.buttonPrimary; // Default to primary if no variant is provided
+    }
+};
+
+const getButtonTextStyle = (variants: string) => {
+    switch (variants) {
+        case 'primary':
+            return styles.buttonPrimaryText;
+        case 'secondary':
+            return styles.buttonSecondaryText;
+        case 'buzzer':
+            return styles.buttonPrimaryText; // Buzzer uses primary text style
     }
 };
 
@@ -28,7 +41,8 @@ export default function Button({
         | 'primary'
         | 'secondary'
         | 'primaryDisabled'
-        | 'secondaryDisabled';
+        | 'secondaryDisabled'
+        | 'buzzer';
     disabled?: boolean;
 }) {
     return (
@@ -40,9 +54,7 @@ export default function Button({
             <Text
                 style={[
                     styles.buttonText,
-                    variants === 'primary'
-                        ? styles.buttonPrimaryText
-                        : styles.buttonSecondaryText,
+                    getButtonTextStyle(variants || 'primary'),
                 ]}
             >
                 {text}
@@ -90,5 +102,16 @@ const styles = StyleSheet.create({
     },
     buttonSecondaryTextDisabled: {
         color: '#d3d3d3',
+    },
+    buzzerButton: {
+        backgroundColor: '#694aff',
+        padding: 20,
+        borderRadius: 70,
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 8,
     },
 });
