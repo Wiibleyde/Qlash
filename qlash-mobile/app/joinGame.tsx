@@ -22,9 +22,9 @@ export default function JoinGame() {
 
     useEffect(() => {
         socket.on('join', (data) => {
-            const { joined, gameUuid, message } = data;
-            if (joined) {
-                router.push(`/hostLobby?game=${gameUuid}`);
+            const { success, gameUuid, message } = data;
+            if (success) {
+                router.push(`/lobby?game=${gameUuid}`);
                 console.log(`Joined game with UUID: ${gameUuid}`);
                 // Redirect to game page or update UI accordingly
             } else {
@@ -55,7 +55,7 @@ export default function JoinGame() {
                 <OtpForm length={6} otp={otp} setOtp={setOtp} />
                 <View style={styles.buttonContainer}>
                     <Button
-                        text="Create"
+                        text="Join"
                         action={handleJoinGame}
                         variants="primary"
                     />

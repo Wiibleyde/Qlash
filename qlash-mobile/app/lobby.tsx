@@ -4,7 +4,6 @@ import { socket } from '@/utils/socket';
 import { SimplePlayer } from '../../qlash-shared/types/user';
 import { toast } from 'sonner-native';
 import { useLocalSearchParams } from 'expo-router';
-import Button from '@/components/ui/Button';
 
 export default function Hostlobby() {
     const params = useLocalSearchParams();
@@ -53,19 +52,7 @@ export default function Hostlobby() {
                         ))}
                     </View>
                 </View>
-                <View style={styles.quizContainer}>
-                    <Text style={styles.title}>Quiz :</Text>
-                    <View style={styles.selectedQuizContainer}>
-                        <Text style={styles.title}>Quiz Name</Text>
-                    </View>
-                    <Button
-                        action={() => {}}
-                        text="Choose Quiz"
-                        variants="primary"
-                    />
-                </View>
             </View>
-            <Button action={() => {}} text="Start Game" variants="primary" />
         </View>
     );
 }
@@ -137,25 +124,5 @@ const styles = StyleSheet.create({
     playerText: {
         fontSize: 16,
         color: '#193ab2',
-    },
-    quizContainer: {
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 20,
-    },
-    selectedQuizContainer: {
-        width: '90%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 20,
-        borderRadius: 8,
-        backgroundColor: '#f1edff',
-        paddingHorizontal: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
     },
 });

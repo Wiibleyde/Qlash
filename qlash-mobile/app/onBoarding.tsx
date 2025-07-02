@@ -109,17 +109,10 @@ export default function OnBoarding() {
                 <View style={styles.divider} />
                 <Button
                     action={() => {
-                        router.push('/signup');
+                        router.push('/joinGame');
                     }}
-                    text="GET STARTED"
+                    text="JOIN A GAME"
                     variants="primary"
-                />
-                <Button
-                    action={() => {
-                        router.push('/signin');
-                    }}
-                    text="I ALREADY HAVE AN ACCOUNT"
-                    variants="secondary"
                 />
             </View>
         </View>

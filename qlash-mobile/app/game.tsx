@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import QCMAnswerGrid from '@/components/ui/grid/QCMAnswerGrid';
 import TrueFalse from '@/components/ui/grid/TrueFalse';
 import Puzzle from '@/components/ui/grid/Puzzle';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import Buzzer from '@/components/ui/grid/Buzzer';
 
 const getContainerStyle = (bool: true | false) => {
     switch (bool) {
@@ -59,17 +59,7 @@ export default function Game() {
                 </View>
             </View>
             {!answersSelectedBool ? (
-                <Puzzle
-                    data={[
-                        {
-                            key: '1',
-                            label: 'Item 1',
-                        },
-                        { key: '2', label: 'Item 2' },
-                        { key: '3', label: 'Item 3' },
-                        { key: '4', label: 'Item 4' },
-                    ]}
-                />
+                <Buzzer />
             ) : waitingForPlayers ? (
                 <View style={styles.answerButtonsContainer}>
                     <Button
