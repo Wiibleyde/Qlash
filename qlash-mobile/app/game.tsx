@@ -2,13 +2,28 @@ import { View, Text, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import QCMAnswerGrid from '@/components/ui/grid/QCMAnswerGrid';
+import TrueFalse from '@/components/ui/grid/TrueFalse';
+import Puzzle from '@/components/ui/grid/Puzzle';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const getContainerStyle = (bool: true | false) => {
     switch (bool) {
         case false:
-            return styles.container;
+            return getContainerTypeContainerStyle('puzzle');
         case true:
             return styles.secondaryContainer;
+        default:
+            return styles.container;
+    }
+};
+
+const getContainerTypeContainerStyle = (type: string) => {
+    switch (type) {
+        case 'qcm':
+        case 'trueFalse':
+            return styles.container;
+        case 'puzzle':
+            return styles.puzzleContainer;
         default:
             return styles.container;
     }
@@ -44,8 +59,16 @@ export default function Game() {
                 </View>
             </View>
             {!answersSelectedBool ? (
-                <QCMAnswerGrid
-                    setAnswersSelectedBool={setAnswersSelectedBool}
+                <Puzzle
+                    data={[
+                        {
+                            key: '1',
+                            label: 'Item 1',
+                        },
+                        { key: '2', label: 'Item 2' },
+                        { key: '3', label: 'Item 3' },
+                        { key: '4', label: 'Item 4' },
+                    ]}
                 />
             ) : waitingForPlayers ? (
                 <View style={styles.answerButtonsContainer}>
@@ -87,6 +110,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingVertical: 85,
+    },
+    puzzleContainer: {
+        flex: 1,
+        width: '100%',
+        padding: 20,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
         paddingVertical: 85,
     },
     title: {
