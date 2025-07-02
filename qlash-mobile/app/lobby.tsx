@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import useGameSocket from '@/hook/useGameSocket';
 import { socket } from '@/utils/socket';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { SimplePlayer } from '../../qlash-shared/types/user';
-import { toast } from 'sonner-native';
-import { useLocalSearchParams } from 'expo-router';
 
 export default function Hostlobby() {
     const params = useLocalSearchParams();
@@ -13,23 +13,23 @@ export default function Hostlobby() {
     const [code, setCode] = useState<string | null>(null);
 
     useEffect(() => {
-        socket.on('synclobby', (data) => {
-            if (!data) return;
-            const { success, players: playersInLobby, gameCode } = data;
-            if (success) {
-                setPlayers(playersInLobby);
-                setCode(gameCode);
-            } else {
-                toast.error(
-                    'Erreur lors de la synchronisation des joueurs dans la salle.'
-                );
-            }
-        });
         socket.emit('synclobby', { gameUuid: game });
-        return () => {
-            socket.off('synclobby');
-        };
     }, [game]);
+
+    useGameSocket("synclobby", (data) => {
+        const { success, players: playersInLobby, gameCode } = data;
+        if (success) {
+            setPlayers(playersInLobby);
+            setCode(gameCode);
+        }
+    });
+
+    useGameSocket("startgame", (data) => {
+        const { success, message, gameId } = data;
+        if (success) {
+            router.push(`/game?game=${gameId}`);
+        }
+    });
 
     return (
         <View style={styles.container}>

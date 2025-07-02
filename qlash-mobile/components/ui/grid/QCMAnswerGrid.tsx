@@ -3,42 +3,39 @@ import React from 'react';
 import AnswerButton from '@/components/ui/AnswerButton';
 
 type QCMAnswerGridProps = {
-    setAnswersSelectedBool: React.Dispatch<React.SetStateAction<boolean>>;
+    answers: { id: string; content: string }[];
+    handleAnswer: (answer: number) => void;
 };
 
+const getAnswerButtonVariant = (index: number) => {
+    switch (index) {
+        case 1:
+            return 'red';
+        case 2:
+            return 'blue';
+        case 3:
+            return 'yellow';
+        case 4:
+            return 'green';
+        default:
+            return 'red';
+    }
+}
+
 export default function QCMAnswerGrid({
-    setAnswersSelectedBool,
+    answers,
+    handleAnswer,
 }: QCMAnswerGridProps) {
     return (
         <View style={styles.answerButtonsContainer}>
-            <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
-                text="Answer 1"
-                variant="red"
-            />
-            <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
-                text="Answer 2"
-                variant="blue"
-            />
-            <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
-                text="Answer 3"
-                variant="yellow"
-            />
-            <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
-                text="Answer 4"
-                variant="green"
-            />
+            {answers.map((answer, index) => (
+                <AnswerButton
+                    key={answer.id}
+                    action={() => handleAnswer(index)}
+                    text={answer.content}
+                    variant={getAnswerButtonVariant(index)}
+                />
+            ))}
         </View>
     );
 }

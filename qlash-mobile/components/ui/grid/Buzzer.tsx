@@ -1,10 +1,33 @@
-import { View } from 'react-native';
-import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import React from 'react';
+import { View } from 'react-native';
 
-export default function Buzzer() {
-    const [buzzerPressed, setBuzzerPressed] = useState(false);
+type Player = {
+    username: string;
+    socketId?: string;
+    score: number;
+}
+
+type BuzzerProps = {
+    playersBuzzed: string;
+    players: Player[];
+    onBuzz: () => void;
+    isBuzzed: boolean;
+    buzzerAnswer: string;
+    onAnswerChange: (answer: string) => void;
+    onSubmitAnswer: () => void;
+}
+
+export default function Buzzer({
+    playersBuzzed,
+    players,
+    onBuzz,
+    isBuzzed,
+    buzzerAnswer,
+    onAnswerChange,
+    onSubmitAnswer
+}: BuzzerProps) {
 
     return (
         <View
@@ -16,26 +39,33 @@ export default function Buzzer() {
                 alignItems: 'center',
             }}
         >
-            {buzzerPressed ? (
-                <Input
-                    placeholder="Enter your answer"
-                    style={{
-                        width: '80%',
-                        marginBottom: 20,
-                        padding: 10,
-                        borderWidth: 1,
-                        borderColor: '#ccc',
-                        borderRadius: 5,
-                    }}
-                    onSubmitEditing={() => {
-                        // Handle answer submission logic here
-                        setBuzzerPressed(false);
-                    }}
-                />
+            {isBuzzed ? (
+                <>
+                    <Input
+                        placeholder="Enter your answer"
+                        style={{
+                            width: '80%',
+                            marginBottom: 20,
+                            padding: 10,
+                            borderWidth: 1,
+                            borderColor: '#ccc',
+                            borderRadius: 5,
+                        }}
+                        value={buzzerAnswer}
+                        onChangeText={onAnswerChange}
+                    />
+                    <Button
+                        action={() => {
+                            onSubmitAnswer();
+                        }}
+                        text="Submit"
+                        variants="primary"
+                    />
+                </>
             ) : (
                 <Button
                     action={() => {
-                        setBuzzerPressed(true);
+                        onBuzz();
                     }}
                     text="Press Buzzer"
                     variants="buzzer"

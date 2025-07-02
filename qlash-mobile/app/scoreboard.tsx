@@ -1,10 +1,38 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Player from '@/components/ui/scoreboard/player';
 import Button from '@/components/ui/Button';
+import { router, useLocalSearchParams } from 'expo-router';
+import { socket } from '@/utils/socket';
+
+interface Player {
+    username: string;
+    score: number;
+    socketId: string;
+}
 
 export default function Scoreboard() {
-    const [isFinished, setIsFinished] = useState(false);
+    const params = useLocalSearchParams();
+    const game = params.game as string;
+
+    const [scoreboardPlayers, setScoreboardPlayers] = useState<Player[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(`http://${process.env.EXPO_PUBLIC_HOST}:8000/game/${game}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            console.log(data);
+            setScoreboardPlayers(data.leaderboard.players);
+        };
+
+        fetchData();
+    }, [game]);
 
     return (
         <View style={styles.container}>
@@ -12,35 +40,24 @@ export default function Scoreboard() {
             <View style={styles.divider} />
             <View style={styles.contentWrapper}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <Player index={1} name="Lytzeer" score={300} />
-                    <Player
-                        index={2}
-                        name="Lytzeer2"
-                        score={250}
-                        isCurrentPlayer
-                    />
-                    <Player index={3} name="Lytzeer3" score={200} />
+                    {scoreboardPlayers.map((player, index) => (
+                        <Player
+                            isCurrentPlayer={player.socketId === socket.id}
+                            key={player.username}
+                            index={index + 1}
+                            name={player.username}
+                            score={player.score}
+                        />
+                    ))}
                 </ScrollView>
 
                 <View style={styles.buttonContainer}>
-                    {isFinished ? (
-                        <Button
-                            action={() => {
-                                // Handle restart action
-                                setIsFinished(false);
-                            }}
-                            text="Finished!"
-                            variants="secondary"
-                            disabled={false}
-                        />
-                    ) : (
-                        <Button
-                            action={() => {}}
-                            text="Next"
-                            variants="secondary"
-                            disabled={false}
-                        />
-                    )}
+                    <Button
+                        action={() => { router.replace('/') }}
+                        text="Next"
+                        variants="secondary"
+                        disabled={false}
+                    />
                 </View>
             </View>
         </View>

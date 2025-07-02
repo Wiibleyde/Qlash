@@ -6,6 +6,8 @@ import OtpForm from '@/components/ui/OtpForm';
 import { socket } from '@/utils/socket';
 import { router } from 'expo-router';
 import { toast } from 'sonner-native';
+import { joinGame } from '@/services/socket';
+import useGameSocket from '@/hook/useGameSocket';
 
 export default function JoinGame() {
     const [username, setUsername] = useState<string>('');
@@ -14,31 +16,17 @@ export default function JoinGame() {
     const gameCode = otp.join('');
 
     const handleJoinGame = () => {
-        console.log(
-            `Joining game with code: ${gameCode} and username: ${username}`
-        );
-        socket.emit('join', { username, gameCode });
+        joinGame(username, gameCode);
     };
 
-    useEffect(() => {
-        socket.on('join', (data) => {
-            const { success, gameUuid, message } = data;
-            if (success) {
-                router.push(`/lobby?game=${gameUuid}`);
-                console.log(`Joined game with UUID: ${gameUuid}`);
-                // Redirect to game page or update UI accordingly
-            } else {
-                toast.error(
-                    `Failed to join game: the information provided is incorrect or the game does not exist.`
-                );
-                console.error(`Failed to join game: ${message}`);
-                // Show error message to user
-            }
-        });
-        return () => {
-            socket.off('join');
-        };
-    }, []);
+    useGameSocket("join", (data) => {
+        const { success, gameUuid, message } = data;
+        if (success) {
+            router.push(`/lobby?game=${gameUuid}`);
+        } else {
+            toast.error(message);
+        }
+    });
 
     return (
         <View style={styles.container}>

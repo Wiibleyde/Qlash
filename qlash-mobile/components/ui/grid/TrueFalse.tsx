@@ -3,24 +3,20 @@ import React from 'react';
 import AnswerButton from '@/components/ui/AnswerButton';
 
 type TrueFalseProps = {
-    setAnswersSelectedBool: React.Dispatch<React.SetStateAction<boolean>>;
+    handleAnswer: (answer: number) => void;
 };
 
-export default function TrueFalse({ setAnswersSelectedBool }: TrueFalseProps) {
+export default function TrueFalse({ handleAnswer }: TrueFalseProps) {
     return (
         <View style={styles.answerButtonsContainer}>
             <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
+                action={() => handleAnswer(1)}
                 text="True"
                 type="true"
                 variant="green"
             />
             <AnswerButton
-                action={() => {
-                    setAnswersSelectedBool(true);
-                }}
+                action={() => handleAnswer(0)}
                 text="False"
                 type="false"
                 variant="red"

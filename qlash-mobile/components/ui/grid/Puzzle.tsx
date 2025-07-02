@@ -1,24 +1,24 @@
-import { View, Text, StyleSheet } from 'react-native';
-import DraggableFlatList from 'react-native-draggable-flatlist';
-import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 
 type PuzzleProps = {
-    data: { key: string; label: string }[];
-    onDataChange?: (data: { key: string; label: string }[]) => void;
+    options: { id: string; content: string }[];
+    selectedOrder: string[];
+    onReorder: (newOrder: string[]) => void;
+    handleAnswer: (answer: string[]) => void;
 };
 
 export default function Puzzle({
-    data: initialData,
-    onDataChange,
+    options,
+    selectedOrder,
+    onReorder,
+    handleAnswer,
 }: PuzzleProps) {
-    const [data, setData] = useState(initialData);
 
-    const handleDragEnd = ({ data }: { data: typeof initialData }) => {
-        setData(data);
-        if (onDataChange) {
-            onDataChange(data);
-        }
+    const handleDragEnd = ({ data }: { data: { id: string; content: string }[] }) => {
+        onReorder(data.map((item) => item.id));
     };
 
     return (
@@ -30,13 +30,13 @@ export default function Puzzle({
             }}
         >
             <DraggableFlatList
-                data={data}
+                data={options}
                 onDragEnd={handleDragEnd}
                 scrollEnabled={false}
-                keyExtractor={(item) => item.key}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item, drag }) => (
                     <View style={styles.item}>
-                        <Text onLongPress={drag}>{item.label}</Text>
+                        <Text onLongPress={drag}>{item.content}</Text>
                     </View>
                 )}
             />
@@ -48,11 +48,7 @@ export default function Puzzle({
                 }}
             >
                 <Button
-                    action={() => {
-                        if (onDataChange) {
-                            onDataChange(data);
-                        }
-                    }}
+                    action={() => handleAnswer(selectedOrder)}
                     text="Submit"
                     variants="primary"
                 />

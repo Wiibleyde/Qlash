@@ -24,6 +24,7 @@ const gameRoute: IRoute = {
                 players: game.players.map(player => ({
                     username: player.username,
                     score: player.score,
+                    socketId: player.socketId,
                 })),
             };
 
