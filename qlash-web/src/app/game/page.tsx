@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import QCMAnswerGrid from "@/components/grid/QCMAnswerGrid";
-import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
 import BuzzerAnswerGrid from "@/components/grid/BuzzerAnswerGrid";
-import { socket } from "@/utils/socket";
-import { useRouter, useSearchParams } from "next/navigation";
+import PuzzleAnswerGrid from "@/components/grid/PuzzleAnswerGrid";
+import QCMAnswerGrid from "@/components/grid/QCMAnswerGrid";
 import Loading from "@/components/Loading";
+import useGameSocket from "@/hook/useGameSocket";
+import { answerQuestion, buzz } from "@/services/socket";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type QuestionType = "Question à choix multiple" | "Vrai/Faux" | "Puzzle" | "Buzzer";
 
@@ -23,7 +24,7 @@ interface Player {
 const GameQuestion = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const game = searchParams.get("game");
+  const game = searchParams.get("game") as string;
   const [timer, setTimer] = useState(30);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [rankingOrder, setRankingOrder] = useState<string[]>([]);
@@ -42,7 +43,7 @@ const GameQuestion = () => {
   const handleBuzz = () => {
     if (!hasBuzzed) {
       setHasBuzzed(true);
-      socket.emit("game:buzzed", { gameUuid: game });
+      buzz(game);
     }
   };
 
@@ -53,7 +54,7 @@ const GameQuestion = () => {
   const handleSubmitBuzzerAnswer = () => {
     if (buzzerAnswerInput.trim() === "") return;
 
-    socket.emit("game:answer", { gameUuid: game, answer: buzzerAnswerInput });
+    answerQuestion(game, buzzerAnswerInput);
     setWaiting(true);
     setHasBuzzed(false);
     setBuzzerAnswerInput("");
@@ -66,45 +67,35 @@ const GameQuestion = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    socket.on("game:question", ({ question, timer, answers: answersFromServer, currentIndex, quizLength, players: playersFromServer }) => {
-      setPlayerBuzzed("");
-      setPlayers(playersFromServer);
-      setAnswers(answersFromServer);
-      setQuestion(question.content);
-      setTimer(timer);
-      setWaiting(false);
-      setSelectedIdx(null);
-      setQuestionType(question.type.name);
-      setCurrentQuestionIndex(currentIndex);
-      setQuizLength(quizLength);
-      if (question.type.name === "Puzzle" && question.options) {
-        console.log("Setting ranking order for Puzzle type", question.options);
-        setRankingOrder(answersFromServer.map((opt: QCMAnswerOption) => opt.id));
-      }
-    });
-    socket.on("game:wait", () => setWaiting(true));
-    socket.on("game:buzzer:wait", (data) => {
-      setPlayerBuzzed(data.player.username);
-    });
-    socket.on("game:end", () => {
-      router.push(`/scoreboard?game=${game}`);
-    });
-    return () => {
-      socket.off("game:question");
-      socket.off("game:wait");
-      socket.off("game:buzzer:wait");
-      socket.off("game:end");
-    };
-  }, [game, router]);
+  useGameSocket("game:question", (data) => {
+    const { question, timer, answers: answersFromServer, currentIndex, quizLength, players: playersFromServer } = data;
+    setPlayerBuzzed("");
+    setPlayers(playersFromServer);
+    setAnswers(answersFromServer);
+    setQuestion(question.content);
+    setTimer(timer);
+    setWaiting(false);
+    setSelectedIdx(null);
+    setQuestionType(question.type.name);
+    setCurrentQuestionIndex(currentIndex);
+    setQuizLength(quizLength);
+    setRankingOrder(answersFromServer.map((opt: QCMAnswerOption) => opt.id));
+
+  });
+
+  useGameSocket("game:wait", () => setWaiting(true));
+  useGameSocket("game:buzzer:wait", (data) => {
+    setPlayerBuzzed(data.player.username);
+  });
+  useGameSocket("game:end", () => {
+    router.push(`/scoreboard?game=${game}`);
+  });
 
   const handleAnswer = (answer: number | string[]) => {
-    console.log("Submitting answer:", answer);
-    console.log("Question type:", questionType);
     if (questionType === "Puzzle") {
-      socket.emit("game:answer", { gameUuid: game, answer: rankingOrder });
+      answerQuestion(game, rankingOrder);
     } else {
-      socket.emit("game:answer", { gameUuid: game, answer });
+      answerQuestion(game, answer);
       if (typeof answer === "number") setSelectedIdx(answer);
     }
     setWaiting(true);
@@ -149,13 +140,11 @@ const GameQuestion = () => {
           <BuzzerAnswerGrid
             playersBuzzed={playerBuzzed}
             players={players}
-            yourScore={players.find((p) => p.socketId === socket.id)?.score ?? 0}
             onBuzz={handleBuzz}
             isBuzzed={hasBuzzed}
             buzzerAnswer={buzzerAnswerInput}
             onAnswerChange={handleBuzzerAnswerChange}
             onSubmitAnswer={handleSubmitBuzzerAnswer}
-            socketId={socket.id as string}
           />
         </>
       );
