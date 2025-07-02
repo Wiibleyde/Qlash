@@ -1,4 +1,5 @@
-import React from "react";
+import { socket } from "@/utils/socket";
+import React, { useMemo } from "react";
 
 interface Player {
   username: string;
@@ -9,8 +10,6 @@ interface Player {
 interface BuzzerProps {
   players: Player[];
   playersBuzzed: string;
-  socketId: string;
-  yourScore: number;
   onBuzz: () => void;
   isBuzzed: boolean;
   buzzerAnswer: string;
@@ -21,15 +20,16 @@ interface BuzzerProps {
 const BuzzerAnswerGrid: React.FC<BuzzerProps> = ({
   players,
   playersBuzzed,
-  socketId,
-  yourScore,
   onBuzz,
   isBuzzed,
   buzzerAnswer,
   onAnswerChange,
   onSubmitAnswer,
 }) => {
-  const currentPlayer = players.find((p) => p.socketId === socketId);
+  const currenPLayerScore = useMemo(() => {
+    return players.find((p) => p.socketId === socket.id)?.score ?? 0;
+  }, [players]);
+  const currentPlayer = players.find((p) => p.socketId === socket.id);
   const isCurrentPlayerBuzzed =
     playersBuzzed !== "" && currentPlayer?.username === playersBuzzed;
   const someoneElseBuzzed =
@@ -113,7 +113,7 @@ const BuzzerAnswerGrid: React.FC<BuzzerProps> = ({
                 someoneElseBuzzed ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
               }`}
             >
-              {yourScore}
+              {currenPLayerScore}
             </div>
           </div>
         )}

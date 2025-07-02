@@ -1,34 +1,30 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import Button from '@/components/Button'
-import Input from '@/components/Input'
-import { socket } from '@/utils/socket';
-import { useRouter } from 'next/navigation'
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 import Navbar from '@/components/Navbar';
+import useGameSocket from '@/hook/useGameSocket';
+import { createGame } from '@/services/socket';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
-const Join = () => {
+const Create = () => {
 
   const [username, setUsername] = useState<string>('')
 
   const router = useRouter();
 
-  useEffect(() => {
-    socket.on("create", (data) => {
-      const { success, gameUuid } = data;
-      if (success) {
-        router.push(`/lobby?game=${gameUuid}`);
-      } else {
-        toast.error("Impossible de créer la partie, le nom d'utilisateur est requis.");
-      }
-    });
-    return () => {
-      socket.off("create");
+  useGameSocket("create", (data) => {
+    const { success, gameUuid } = data;
+    if (success) {
+      router.push(`/lobby?game=${gameUuid}`);
+    } else {
+      toast.error("Impossible de créer la partie, le nom d'utilisateur est requis.");
     }
-  }, []);
+  });
 
   const handleCreateGame = () => {
-    socket.emit("create", { username });
+    createGame(username);
   }
 
   return (
@@ -56,4 +52,4 @@ const Join = () => {
   )
 }
 
-export default Join
+export default Create
