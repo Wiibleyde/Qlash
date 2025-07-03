@@ -1,6 +1,6 @@
-import { View, StyleSheet } from 'react-native';
-import React from 'react';
 import AnswerButton from '@/components/ui/AnswerButton';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 type QCMAnswerGridProps = {
     answers: { id: string; content: string }[];
@@ -33,7 +33,7 @@ export default function QCMAnswerGrid({
                     key={answer.id}
                     action={() => handleAnswer(index)}
                     text={answer.content}
-                    variant={getAnswerButtonVariant(index)}
+                    variant={getAnswerButtonVariant(index + 1)}
                 />
             ))}
         </View>
