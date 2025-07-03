@@ -71,20 +71,20 @@ export default function Navbar() {
 
         <div className="hidden lg:flex lg:gap-x-6 flex items-center justify-between">
           <div className='lg:flex lg:gap-x-6 flex items-center'>
-            <Link href="/create" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Host</Link>
-            <Link href="/join" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Join</Link>
+            <Link href="/create" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Héberger</Link>
+            <Link href="/join" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Rejoindre</Link>
           </div>
           <div className='lg:flex lg:gap-x-6 flex items-center'>
             {isLoggedIn ? (
               <>
-                <Link href="/newquizz" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">New Quizz</Link>
-                <Link href="/profile" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Profile</Link>
-                <button onClick={handleLogout} className="text-sm font-semibold text-gray-900 hover:text-indigo-600 hover:cursor-pointer transition duration-200 ease-in-out">Logout</button>
+                <Link href="/newquizz" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Nouveau Quizz</Link>
+                <Link href="/profile" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Profil</Link>
+                <button onClick={handleLogout} className="text-sm font-semibold text-gray-900 hover:text-indigo-600 hover:cursor-pointer transition duration-200 ease-in-out">Déconnexion</button>
               </>
             ) : (
               <>
-                <Link href="/signup" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Log in</Link>
-                <Link href="/signup" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition duration-200 ease-in-out">Sign up</Link>
+                <Link href="/signup" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition duration-200 ease-in-out">Se connecter</Link>
+                <Link href="/signup" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition duration-200 ease-in-out">S&apos;inscrire</Link>
               </>
             )}
           </div>

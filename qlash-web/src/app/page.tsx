@@ -7,13 +7,13 @@ export default function Home() {
       <Navbar />
       <div className="h-screen flex items-center">
         <TextImageSection
-          text="Create, share and play quizzes whenever and wherever you want"
+          text="Créez, partagez et jouez à des quiz où et quand vous le souhaitez."
           imageSrc="/images/multiple-choice.svg"
         />
       </div>
       <div className="min-h-[70vh] flex items-center">
         <TextImageSection
-          text="Find fun and interesting quizzes to boost up your knowledge"
+          text="Trouvez des quiz amusants et intéressants pour améliorer vos connaissances."
           imageSrc="/images/questions.svg"
           reverse
         />

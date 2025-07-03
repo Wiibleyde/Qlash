@@ -44,7 +44,7 @@ const Join = () => {
               type='text'
               id='username'
               required
-              placeholder='Username'
+              placeholder='Nom d’utilisateur'
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -56,7 +56,7 @@ const Join = () => {
             length={6}
           />
           <Button onClick={handleJoinGame} disabled={isDisabled}>
-            Join Game
+            Rejoindre la partie
           </Button>
         </div>
       </div>

@@ -129,7 +129,7 @@ const SignUp = () => {
                             onChange={handleSignUpChange}
                             className='w-full p-2 border-b border-black placeholder:text-black' 
                             required 
-                            placeholder='Username' 
+                            placeholder='Nom d’utilisateur' 
                         />
                     </div>
                     <div className='mb-4'>
@@ -151,11 +151,11 @@ const SignUp = () => {
                             onChange={handleSignUpChange}
                             className='w-full p-2 border-b border-black placeholder:text-black' 
                             required 
-                            placeholder='Password' 
+                            placeholder='Mot de passe' 
                         />
                     </div>
                     <Button type='submit' disabled={loading}>
-                        {loading ? 'Signing Up...' : 'Sign Up'}
+                        {loading ? 'Signing Up...' : 'S\'inscrire'}
                     </Button>
                 </form>
             </div>
@@ -182,11 +182,11 @@ const SignUp = () => {
                             onChange={handleSignInChange}
                             className='w-full p-2 border-b border-black placeholder:text-black' 
                             required 
-                            placeholder='Password' 
+                            placeholder='Mot de passe' 
                         />
                     </div>
                     <Button type='submit' disabled={loading}>
-                        {loading ? 'Signing In...' : 'Sign In'}
+                        {loading ? 'En connexion...' : 'Se connecter'}
                     </Button>
                 </form>
             </div>
