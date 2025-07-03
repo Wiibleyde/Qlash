@@ -29,7 +29,7 @@ const GameQuestion = () => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [rankingOrder, setRankingOrder] = useState<string[]>([]);
   const [questionType, setQuestionType] = useState<QuestionType>("Question à choix multiple");
-  const [question, setQuestion] = useState<string>("test");
+  const [question, setQuestion] = useState<string>("");
   const [answers, setAnswers] = useState<QCMAnswerOption[]>([]);
   const [waiting, setWaiting] = useState<boolean>(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
