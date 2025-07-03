@@ -85,6 +85,7 @@ const GameQuestion = () => {
 
   useGameSocket("game:wait", () => setWaiting(true));
   useGameSocket("game:buzzer:wait", (data) => {
+    setWaiting(true);
     setPlayerBuzzed(data.player.username);
   });
   useGameSocket("game:end", () => {
