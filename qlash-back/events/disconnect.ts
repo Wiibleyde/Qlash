@@ -1,6 +1,6 @@
 import { findGameBySocketId } from "../helpers/game";
 import { Logger } from "../utils/logger";
-import { type IEvent } from "./webserver";
+import { games, type IEvent } from "./webserver";
 
 const logger = new Logger(__filename.split('/').pop() as string);
 
@@ -12,14 +12,27 @@ const disconnect: IEvent = {
                 logger.warn(`No game found for socket ${socket.id}`);
                 return;
             }
-            const playerIndex = game.players.findIndex(player => player.socketId === socket.id);
-            if (playerIndex === -1) {
+            const player = game.players.find(player => player.socketId === socket.id);
+            if (!player) {
                 logger.warn(`Player with socket ${socket.id} not found in game ${game.id}`);
                 return;
             }
-            const player = game.players[playerIndex];
-            game.players.splice(playerIndex, 1);
+            // Remove player from game
+            game.players = game.players.filter(p => p.socketId !== socket.id);
             logger.info(`Player ${player?.username} disconnected from game ${game.id}`);
+            if (player.isHost) {
+                if (game.players.length > 0) {
+                    // If the host disconnects, promote the next player to host
+                    const newHost = game.players[0];
+                    if (newHost) {
+                        newHost.isHost = true;
+                        logger.info(`Player ${newHost.username} is now the host of game ${game.id}`);
+                    }
+                } else {
+                    logger.info(`No players left in game ${game.id}, removing game`);
+                    games.splice(games.indexOf(game), 1);
+                }
+            }
             
             socket.to(game.id).emit("synclobby", {
                 success: true,
