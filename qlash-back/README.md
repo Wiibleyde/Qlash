@@ -14,10 +14,12 @@ Backend du projet Qlash, basé sur Node.js (Bun), Express, Prisma et Socket.io.
    ```
    DATABASE_URL="postgresql://root:RootPassword@localhost:5432/qlashdatabase?schema=public"
    JWT_SECRET="your_jwt_secret"
+   GEMINI_API_KEY="your_gemini_api_key" (pour la génération de quiz par IA)
    ```
 
 3. **Initialiser la base de données :**
    ```bash
+   docker compose up -d
    bun prisma migrate deploy
    bun prisma generate
    bun prisma db seed
