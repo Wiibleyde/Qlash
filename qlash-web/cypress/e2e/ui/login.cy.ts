@@ -1,3 +1,6 @@
+//? This file is used to test the login and register functionality of the Qlash web application using Cypress.
+//? It checks if the login and register forms are displayed correctly and if the input fields and buttons are visible.
+
 describe("Login Register Page", () => {
   it("should display the login form", () => {
     cy.visit("/signup");

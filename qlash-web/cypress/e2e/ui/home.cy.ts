@@ -1,3 +1,7 @@
+//? This file is used by Cypress to run end-to-end tests for the home page of the Qlash web application.
+//? It includes tests for the visibility of various elements on the home page, such as the
+//? navigation bar, logo, text-image sections, and sidebar functionality.
+
 describe("Home Page", () => {
   beforeEach(() => {
     cy.visit("/");
