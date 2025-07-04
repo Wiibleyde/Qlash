@@ -10,10 +10,14 @@ import PresetSelector from '@/components/PresetSelector';
 import { startGameErrorTranslations } from '@/constants/error';
 import { socket } from '@/utils/socket';
 import { SimplePlayer } from '../../../../qlash-shared/types/user';
+import useSWR from 'swr'
 
 function translateError(msg: string) {
   return startGameErrorTranslations[msg] || msg;
 }
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 const Lobby = () => {
 
@@ -28,8 +32,12 @@ const Lobby = () => {
   const [selectedPresets, setSelectedPresets] = useState<{ id: string; name: string }[]>([]);
   const [selectingPreset, setSelectingPreset] = useState(false);
 
-  const [quizPresets, setQuizPresets] = useState<{ id: string; name: string }[]>([]);
-  const [loadingQuizzes, setLoadingQuizzes] = useState(true);
+  const { data, isLoading } = useSWR(`http://${process.env.NEXT_PUBLIC_HOST}:8000/quizzes/latest`, fetcher)
+
+  const quizPresets = data ? data.map((quiz: any) => ({
+    id: quiz.id,
+    name: quiz.name,
+  })) : [];
 
   const handleCopyLink = () => {
     if (!code) return;
@@ -74,27 +82,8 @@ const Lobby = () => {
     };
   }, [game]);
 
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const res = await fetch(`http://${process.env.NEXT_PUBLIC_HOST}:8000/quizzes/latest`);
-        const data = await res.json();
-        setQuizPresets(data.map((quiz: any) => ({
-          id: quiz.id,
-          name: quiz.name,
-        })));
-      } catch (error) {
-        console.error('Erreur lors du fetch des quizzes:', error);
-      } finally {
-        setLoadingQuizzes(false);
-      }
-    };
-
-    fetchQuizzes();
-  }, []);
-
   const handleAddPreset = (presetId: string) => {
-    const preset = quizPresets.find(q => q.id === presetId);
+    const preset = quizPresets.find((q: any) => q.id === presetId);
     if (preset && !selectedPresets.some(p => p.id === presetId)) {
       setSelectedPresets(prev => [...prev, { id: preset.id, name: preset.name }]);
     }
@@ -146,7 +135,7 @@ const Lobby = () => {
               <>
                 <div>
                   <h2 className="text-2xl font-extrabold mb-4 text-purple-700">Choisissez un quiz</h2>
-                  {loadingQuizzes ? (
+                  {isLoading ? (
                     <p className="text-gray-400 italic">Chargement des quizz...</p>
                   ) : (
                     <PresetSelector

@@ -18,11 +18,9 @@ const allQuestionTypes = [
   'Buzzer'
 ];
 
-const LobbyCreate = () => {
+const NewQuizz = () => {
   const searchParams = useSearchParams();
   const quizId = searchParams.get('quizId');
-
-  const [players] = useState(['Alice', 'Bob', 'Charlie']);
   const [quiz, setQuiz] = useState<Partial<IQuiz>>({
     name: '',
     description: '',
@@ -73,6 +71,7 @@ const LobbyCreate = () => {
     const newQuestion: IQuestion = {
       id: '',
       quizId: '',
+      typeId: '',
       content: formData.question,
       type: {
         id: '',
@@ -353,4 +352,4 @@ const LobbyCreate = () => {
   );
 };
 
-export default LobbyCreate;
+export default NewQuizz;
