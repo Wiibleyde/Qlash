@@ -4,19 +4,15 @@ Frontend Next.js/React pour Qlash.
 
 ## Installation
 
+**Attention vous devez avoir fait l'installation de [qlash-back](../qlash-back/README.md)**
+
 1. **Installer les dépendances :**
+
    ```bash
    bun install
    ```
 
-2. **Configurer les variables d'environnement :**
-   Lancer d'abord le backend pour générer les variables d'environnement nécessaires. 
-   ```bash
-   cd ../qlash-back
-   bun run index.ts
-   ```
-
-3. **Lancer le serveur de développement :**
+2. **Lancer le serveur de développement :**
    ```bash
    bun run dev
    ```
