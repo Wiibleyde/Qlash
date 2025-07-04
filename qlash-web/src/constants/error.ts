@@ -4,7 +4,7 @@ export const startGameErrorTranslations: Record<string, string> = {
     "No quiz selected.": "Aucun quiz sélectionné.",
     "Quiz not found.": "Quiz introuvable.",
     "Error fetching quiz.": "Erreur lors de la récupération du quiz.",
-    // Ajoute d'autres traductions si besoin
+    "Game is starting.": "La partie commence."
 };
 
 export const errorTranslations: Record<string, string> = {
@@ -13,5 +13,5 @@ export const errorTranslations: Record<string, string> = {
     "Email, password and name are required": "Email, mot de passe et nom requis",
     "Email and password are required": "Email et mot de passe requis",
     "Request body is required": "Le corps de la requête est requis",
-    "Internal server error": "Erreur interne du serveur"
+    "Internal server error": "Erreur interne du serveur",
 };
