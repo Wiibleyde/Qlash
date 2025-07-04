@@ -15,3 +15,7 @@ export const answerQuestion = (gameUuid: string, answer: string | string[] | num
 export const buzz = (gameUuid: string) => {
     socket.emit("game:buzzed", { gameUuid });
 }
+
+export const startGame = (gameUuid: string, selectedQuiz: { id: string; name: string }) => {
+    socket.emit("startgame", { gameUuid, selectedQuiz });
+}

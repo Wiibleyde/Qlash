@@ -2,30 +2,11 @@
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Navbar from '@/components/Navbar';
-import useGameSocket from '@/hook/useGameSocket';
-import { createGame } from '@/services/socket';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import useCreate from '@/hook/useCreate';
 
 const Create = () => {
 
-  const [username, setUsername] = useState<string>('')
-
-  const router = useRouter();
-
-  useGameSocket("create", (data) => {
-    const { success, gameUuid } = data;
-    if (success) {
-      router.push(`/lobby?game=${gameUuid}`);
-    } else {
-      toast.error("Impossible de créer la partie, le nom d'utilisateur est requis.");
-    }
-  });
-
-  const handleCreateGame = () => {
-    createGame(username);
-  }
+  const { handleCreateGame, setUsername, username } = useCreate();
 
   return (
     <div className='bg-white h-screen text-black flex flex-row items-center justify-evenly'>

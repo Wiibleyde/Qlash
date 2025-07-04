@@ -1,36 +1,21 @@
 "use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-
 import Button from '@/components/Button';
 import Navbar from '@/components/Navbar';
 import PresetSelector from '@/components/PresetSelector';
-import { startGameErrorTranslations } from '@/constants/error';
-import { socket } from '@/utils/socket';
-import { SimplePlayer } from '../../../../qlash-shared/types/user';
-import useSWR from 'swr'
-
-function translateError(msg: string) {
-  return startGameErrorTranslations[msg] || msg;
-}
+import useLobby from '@/hook/useLobby';
+import { startGame } from '@/services/socket';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
+import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-
 const Lobby = () => {
-
-  const router = useRouter();
   const searchParams = useSearchParams();
   const game = searchParams.get('game');
 
-  const [players, setPlayers] = useState<SimplePlayer[]>([]);
-  const [code, setCode] = useState<string | null>(null);
-  const [isHost, setIsHost] = useState<boolean>(false);
-
-  const [selectedPresets, setSelectedPresets] = useState<{ id: string; name: string }[]>([]);
-  const [selectingPreset, setSelectingPreset] = useState(false);
+  const { players, code, isHost, selectedPresets, selectingPreset, setSelectingPreset, setSelectedPresets } = useLobby(game as string);
 
   const { data, isLoading } = useSWR(`http://${process.env.NEXT_PUBLIC_HOST}:8000/quizzes/latest`, fetcher)
 
@@ -49,38 +34,8 @@ const Lobby = () => {
   };
 
   const handleStartGame = () => {
-    socket.emit("startgame", { gameUuid: game, selectedQuiz: selectedPresets[0] });
+    startGame(game as string, selectedPresets[0]);
   }
-
-  useEffect(() => {
-    socket.on("synclobby", (data) => {
-      if (!data) return;
-      const { success, players: playersInLobby, gameCode } = data;
-      if (success) {
-        setIsHost(playersInLobby.some((player: SimplePlayer) => player.socketId === socket.id && player.isHost));
-        setPlayers(playersInLobby);
-        setCode(gameCode);
-      } else {
-        toast.error("Erreur lors de la synchronisation des joueurs dans la salle.");
-      }
-    });
-
-    socket.on("startgame", (data) => {
-      const { success, message, gameId } = data;
-      if (success) {
-        toast.success(translateError(message));
-        router.push(`/game?game=${gameId}`);
-      } else {
-        toast.error(translateError(message));
-      }
-    });
-
-    socket.emit("synclobby", { gameUuid: game });
-
-    return () => {
-      socket.off("synclobby");
-    };
-  }, [game]);
 
   const handleAddPreset = (presetId: string) => {
     const preset = quizPresets.find((q: any) => q.id === presetId);
