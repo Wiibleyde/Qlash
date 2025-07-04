@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -18,7 +19,6 @@ const ProfilePage = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState<string>("");
@@ -39,9 +39,9 @@ const ProfilePage = () => {
 
       if (!response.ok) {
         if (response.status === 403) {
-          setError("Accès interdit : vous ne pouvez consulter que votre propre profil.");
+          toast.error("Accès interdit : vous ne pouvez consulter que votre propre profil.");
         } else {
-          setError("Erreur lors du chargement du profil.");
+          toast.error("Erreur lors du chargement du profil.");
         }
         setLoading(false);
         return;
@@ -51,7 +51,7 @@ const ProfilePage = () => {
       setUser(data);
       setEditedName(data.name || "");
     } catch {
-      setError("Erreur réseau lors du chargement.");
+      toast.error("Erreur réseau lors du chargement du profil.");
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,6 @@ const ProfilePage = () => {
   const handleCancelClick = () => {
     if (user) setEditedName(user.name || "");
     setIsEditing(false);
-    setError("");
   };
 
   const handleSaveClick = async () => {
@@ -85,7 +84,7 @@ const ProfilePage = () => {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Token manquant, veuillez vous reconnecter.");
+      toast.error("Token manquant, veuillez vous reconnecter.");
       return;
     }
 
@@ -101,32 +100,21 @@ const ProfilePage = () => {
 
       if (!response.ok) {
         if (response.status === 403) {
-          setError("Accès interdit : vous ne pouvez modifier que votre propre profil.");
+          toast.error("Accès interdit : vous ne pouvez modifier que votre propre profil.");
         } else {
-          setError("Erreur lors de la mise à jour du profil.");
+          toast.error("Erreur lors de la mise à jour du profil.");
         }
         return;
       }
 
       await fetchUser(user.id);
       setIsEditing(false);
-      setError("");
     } catch {
-      setError("Erreur réseau lors de la mise à jour.");
+      toast.error("Erreur réseau lors de la mise à jour.");
     }
   };
 
   if (loading) return <div className="p-8 text-center">Chargement du profil...</div>;
-
-  if (error)
-    return (
-      <div className="p-8 text-center text-red-600">
-        {error}
-        <div className="mt-4">
-          <Button onClick={() => router.push("/")}>Retour à l&apos;accueil</Button>
-        </div>
-      </div>
-    );
 
   if (!user) return null;
 

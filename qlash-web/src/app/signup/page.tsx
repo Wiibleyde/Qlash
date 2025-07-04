@@ -4,9 +4,15 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { errorTranslations } from '@/constants/error';
 
 const loginUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/auth/login`;
 const registerUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/auth/register`;
+
+function translateError(msg: string) {
+    return errorTranslations[msg] || msg;
+}
 
 const SignUp = () => {
 
@@ -17,14 +23,13 @@ const SignUp = () => {
         email: '',
         password: ''
     });
-    
+
     const [signInData, setSignInData] = useState({
         email: '',
         password: ''
     });
-    
+
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
 
     const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSignUpData({
@@ -43,8 +48,7 @@ const SignUp = () => {
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
-        
+
         try {
             const response = await fetch(registerUrl, {
                 method: 'POST',
@@ -57,21 +61,20 @@ const SignUp = () => {
                     name: signUpData.username
                 }),
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 // Redirection ou autre action après inscription réussie
                 router.push('/'); // Redirection vers la page d'accueil ou une autre page
-                console.log('Registration successful:', data);
+                toast.success('Inscription réussie !');
             } else {
-                setError(data.message || 'Registration failed');
+                toast.error(translateError(data.message) || 'Echec de l\'inscription');
             }
         } catch (err) {
-            setError('Network error. Please try again.');
-            console.error('Registration error:', err);
+            toast.error('Erreur réseau. Veuillez réessayer.');
         } finally {
             setLoading(false);
         }
@@ -80,8 +83,7 @@ const SignUp = () => {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
-        
+
         try {
             const response = await fetch(loginUrl, {
                 method: 'POST',
@@ -90,9 +92,9 @@ const SignUp = () => {
                 },
                 body: JSON.stringify(signInData),
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
@@ -100,11 +102,10 @@ const SignUp = () => {
                 // Redirection ou autre action après connexion réussie
                 console.log('Login successful:', data);
             } else {
-                setError(data.message || 'Login failed');
+                toast.error(translateError(data.message) || 'Echec de la connexion');
             }
         } catch (err) {
-            setError('Network error. Please try again.');
-            console.error('Login error:', err);
+            toast.error('Erreur réseau. Veuillez réessayer.');
         } finally {
             setLoading(false);
         }
@@ -112,46 +113,41 @@ const SignUp = () => {
     return (
         <div className='bg-white h-screen text-black flex flex-row items-center justify-evenly'>
             <Navbar />
-            {error && (
-                <div className='fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
-                    {error}
-                </div>
-            )}
-            
+
             <div className='flex flex-col items-center justify-center h-full'>
                 <h2 className='text-2xl font-bold mb-6 text-center'>Sign Up</h2>
                 <form className='w-96' onSubmit={handleSignUp}>
                     <div className='mb-4'>
-                        <Input 
-                            type='text' 
-                            id='username' 
+                        <Input
+                            type='text'
+                            id='username'
                             value={signUpData.username}
                             onChange={handleSignUpChange}
-                            className='w-full p-2 border-b border-black placeholder:text-black' 
-                            required 
-                            placeholder='Nom d’utilisateur' 
+                            className='w-full p-2 border-b border-black placeholder:text-black'
+                            required
+                            placeholder='Nom d’utilisateur'
                         />
                     </div>
                     <div className='mb-4'>
-                        <Input 
-                            type='email' 
-                            id='email' 
+                        <Input
+                            type='email'
+                            id='email'
                             value={signUpData.email}
                             onChange={handleSignUpChange}
-                            className='w-full p-2 border-b border-black placeholder:text-black' 
-                            required 
-                            placeholder='Email' 
+                            className='w-full p-2 border-b border-black placeholder:text-black'
+                            required
+                            placeholder='Email'
                         />
                     </div>
                     <div className='mb-4'>
-                        <Input 
-                            type='password' 
-                            id='password' 
+                        <Input
+                            type='password'
+                            id='password'
                             value={signUpData.password}
                             onChange={handleSignUpChange}
-                            className='w-full p-2 border-b border-black placeholder:text-black' 
-                            required 
-                            placeholder='Mot de passe' 
+                            className='w-full p-2 border-b border-black placeholder:text-black'
+                            required
+                            placeholder='Mot de passe'
                         />
                     </div>
                     <Button type='submit' disabled={loading}>
@@ -164,25 +160,25 @@ const SignUp = () => {
                 <h2 className='text-2xl font-bold mb-6 text-center'>Sign In</h2>
                 <form className='w-96' onSubmit={handleSignIn}>
                     <div className='mb-4'>
-                        <Input 
-                            type='email' 
-                            id='signin-email' 
+                        <Input
+                            type='email'
+                            id='signin-email'
                             value={signInData.email}
                             onChange={handleSignInChange}
-                            className='w-full p-2 border-b border-black placeholder:text-black' 
-                            required 
-                            placeholder='Email' 
+                            className='w-full p-2 border-b border-black placeholder:text-black'
+                            required
+                            placeholder='Email'
                         />
                     </div>
                     <div className='mb-4'>
-                        <Input 
-                            type='password' 
-                            id='signin-password' 
+                        <Input
+                            type='password'
+                            id='signin-password'
                             value={signInData.password}
                             onChange={handleSignInChange}
-                            className='w-full p-2 border-b border-black placeholder:text-black' 
-                            required 
-                            placeholder='Mot de passe' 
+                            className='w-full p-2 border-b border-black placeholder:text-black'
+                            required
+                            placeholder='Mot de passe'
                         />
                     </div>
                     <Button type='submit' disabled={loading}>

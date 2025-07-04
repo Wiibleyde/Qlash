@@ -6,6 +6,7 @@ import Button from '@/components/Button';
 import QuestionSelector from '@/components/QuestionSelector';
 import QuestionFormWrapper from '@/components/QuestionFormWrapper';
 import type { IQuiz, IQuestion, IOption } from '../../../../qlash-shared/types/quiz';
+import { toast } from 'sonner';
 
 const createQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/quiz`;
 const createIaQuizApiUrl = `http://${process.env.NEXT_PUBLIC_HOST}:8000/ia/quiz`;
@@ -47,12 +48,10 @@ const LobbyCreate = () => {
         const loadedQuiz = await response.json();
         setQuiz(loadedQuiz);
       } else {
-        console.error('Failed to load quiz');
-        alert('Erreur lors du chargement du quiz');
+        toast.error('Échec du chargement du quiz');
       }
     } catch (error) {
-      console.error('Error loading quiz:', error);
-      alert('Erreur lors du chargement du quiz');
+      toast.error('Erreur lors du chargement du quiz');
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +122,7 @@ const LobbyCreate = () => {
 
   const handleSaveQuiz = async () => {
     if (!quiz.name || !quiz.questions?.length) {
-      alert('Veuillez ajouter un nom et au moins une question au quiz');
+      toast.error('Veuillez ajouter un nom et au moins une question au quiz');
       return;
     }
 
@@ -146,14 +145,13 @@ const LobbyCreate = () => {
         if (!quiz.id && result.quiz) {
           setQuiz(result.quiz);
         }
-        alert(quiz.id ? 'Quiz mis à jour avec succès!' : 'Quiz créé avec succès!');
+        toast.success(quiz.id ? 'Quiz mis à jour avec succès!' : 'Quiz créé avec succès!');
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erreur lors de la sauvegarde');
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la sauvegarde du quiz');
+      toast.error('Erreur lors de la sauvegarde du quiz');
     } finally {
       setIsLoading(false);
     }

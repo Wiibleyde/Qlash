@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import Navbar from '@/components/Navbar';
 import Button from '@/components/Button';
+import Navbar from '@/components/Navbar';
 import PresetSelector from '@/components/PresetSelector';
+import { startGameErrorTranslations } from '@/constants/error';
 import { socket } from '@/utils/socket';
 import { SimplePlayer } from '../../../../qlash-shared/types/user';
+
+function translateError(msg: string) {
+  return startGameErrorTranslations[msg] || msg;
+}
 
 const Lobby = () => {
 
@@ -55,10 +60,10 @@ const Lobby = () => {
     socket.on("startgame", (data) => {
       const { success, message, gameId } = data;
       if (success) {
-        toast.success(message);
+        toast.success(translateError(message));
         router.push(`/game?game=${gameId}`);
       } else {
-        toast.error(message);
+        toast.error(translateError(message));
       }
     });
 
@@ -97,8 +102,8 @@ const Lobby = () => {
   };
 
   const handleRemovePreset = (presetId: string) => {
-  setSelectedPresets(prev => prev.filter(p => p.id !== presetId));
-};
+    setSelectedPresets(prev => prev.filter(p => p.id !== presetId));
+  };
 
   return (
     <div className="min-h-screen bg-white text-white flex flex-col">
