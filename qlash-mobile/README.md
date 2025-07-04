@@ -1,50 +1,94 @@
-# Welcome to your Expo app 👋
+# Qlash Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Frontend mobile React Native/Expo pour Qlash.
 
-## Get started
+## Installation
 
-1. Install dependencies
-
+1. **Installer les dépendances :**
    ```bash
-   npm install
+   bun install
    ```
 
-2. Start the app
-
+2. **Configurer les variables d'environnement :**
+Lancer d'abord le backend pour générer les variables d'environnement nécessaires. 
    ```bash
-   npx expo start
+   cd ../qlash-back
+   bun run index.ts
    ```
 
-In the output, you'll find options to open the app in a
+3. **Lancer l'application en développement :**
+   ```bash
+   bun run start
+   ```
+   L'application sera accessible sur un émulateur ou un appareil via l'application Expo Go.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Pages principales
 
-## Get a fresh project
+- `app/index.tsx` : Accueil
+- `app/join.tsx` : Rejoindre une partie avec un code
+- `app/lobby.tsx` : Lobby d'attente avant le jeu
+- `app/game.tsx` : Interface de jeu (questions, réponses, scores)
+- `app/newquizz.tsx` : Création/édition de quiz (manuel ou via IA)
+- `app/profile.tsx` : Profil utilisateur
+- `app/signup.tsx` et `app/signin.tsx` : Inscription et connexion
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## Fonctionnalités
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- **Connexion/Inscription** : Auth via API (`/auth/login`, `/auth/register`)
+- **Création de quiz** : Formulaires pour différents types de questions (QCM, Vrai/Faux, Puzzle, Buzzer)
+- **Lobby multijoueur** : Synchronisation en temps réel via Socket.io
+- **Jeu en temps réel** : Affichage des questions, réponses, scores, gestion du timer
+- **Quiz IA** : Génération de quiz à partir d'un prompt
+- **Profil** : Consultation et modification du profil utilisateur
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## Communication avec le backend
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### API REST
 
-## Join the community
+- **POST `/auth/register`** : Inscription
+- **POST `/auth/login`** : Connexion
+- **GET `/user/:id`** : Infos utilisateur (token requis)
+- **GET `/quiz/:id`** : Récupérer un quiz
+- **POST `/quiz`** : Créer un quiz (token requis)
+- **PUT `/quiz/:id`** : Modifier un quiz (token requis)
+- **GET `/question/types`** : Types de questions
+- **GET `/ia/quiz/:prompt`** : Générer un quiz IA (token requis)
 
-Join our community of developers creating universal apps.
+### Événements Socket.io
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **synclobby** : Synchronisation des joueurs dans le lobby
+- **startgame** : Démarrage de la partie
+- **game:question** : Réception d'une nouvelle question
+- **game:answer** : Envoi de la réponse d'un joueur
+- **game:wait** : Attente entre les questions
+- **game:end** : Fin du quiz
+- **game:buzzed** : Gestion du buzzer pour les questions rapides
+
+Voir la [documentation backend](../qlash-back/README.md) pour le détail des payloads.
+
+---
+
+## Structure des composants
+
+- `components/` : Composants réutilisables (Navbar, Loading, Scoreboard, etc.)
+- `components/ui/` : Composants d'interface utilisateur (boutons, grilles de réponses, etc.)
+- `hook/` : Hooks personnalisés (ex: useGameSocket)
+- `app/` : Pages et écrans principaux (Expo Router)
+
+---
+
+## Notes
+
+- Le token JWT est stocké localement après connexion.
+- Le front mobile communique avec le backend via les URLs définies dans les hooks et services.
+- Pour toute modification des types partagés, voir [`qlash-shared`](../qlash-shared/).
+
+---
+
+Pour plus de détails, consulte les fichiers sources dans

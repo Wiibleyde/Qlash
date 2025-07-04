@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Qlash Web
 
-## Getting Started
+Frontend Next.js/React pour Qlash.
 
-First, run the development server:
+## Installation
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Installer les dépendances :**
+   ```bash
+   bun install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Configurer les variables d'environnement :**
+   Lancer d'abord le backend pour générer les variables d'environnement nécessaires. 
+   ```bash
+   cd ../qlash-back
+   bun run index.ts
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Lancer le serveur de développement :**
+   ```bash
+   bun run dev
+   ```
+   Le site sera accessible sur [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Pages principales
 
-To learn more about Next.js, take a look at the following resources:
+- `/` : Accueil
+- `/join` : Rejoindre une partie avec un code
+- `/lobby` : Lobby d'attente avant le jeu
+- `/game` : Interface de jeu (questions, réponses, scores)
+- `/newquizz` : Création/édition de quiz (manuel ou via IA)
+- `/profile` : Profil utilisateur
+- `/signup` et `/signin` : Inscription et connexion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Fonctionnalités
 
-## Deploy on Vercel
+- **Connexion/Inscription** : Auth via API (`/auth/login`, `/auth/register`)
+- **Création de quiz** : Formulaires pour différents types de questions (QCM, Vrai/Faux, Puzzle, Buzzer)
+- **Lobby multijoueur** : Synchronisation en temps réel via Socket.io
+- **Jeu en temps réel** : Affichage des questions, réponses, scores, gestion du timer
+- **Quiz IA** : Génération de quiz à partir d'un prompt
+- **Profil** : Consultation et modification du profil utilisateur
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Communication avec le backend
+
+### API REST
+
+- **POST `/auth/register`** : Inscription
+- **POST `/auth/login`** : Connexion
+- **GET `/user/:id`** : Infos utilisateur (token requis)
+- **GET `/quiz/:id`** : Récupérer un quiz
+- **POST `/quiz`** : Créer un quiz (token requis)
+- **PUT `/quiz/:id`** : Modifier un quiz (token requis)
+- **GET `/question/types`** : Types de questions
+- **GET `/ia/quiz/:prompt`** : Générer un quiz IA (token requis)
+
+### Événements Socket.io
+
+- **synclobby** : Synchronisation des joueurs dans le lobby
+- **startgame** : Démarrage de la partie
+- **game:question** : Réception d'une nouvelle question
+- **game:answer** : Envoi de la réponse d'un joueur
+- **game:wait** : Attente entre les questions
+- **game:end** : Fin du quiz
+- **game:buzzed** : Gestion du buzzer pour les questions rapides
+
+Voir la [documentation backend](../qlash-back/README.md) pour le détail des payloads.
+
+---
+
+## Structure des composants
+
+- `components/` : Composants réutilisables (Navbar, Loading, Scoreboard, etc.)
+- `components/forms/` : Formulaires pour chaque type de question
+- `components/grid/` : Grilles d'affichage des réponses
+- `hook/` : Hooks personnalisés (ex: useLobby)
+- `app/` : Pages Next.js (routeur)
+
+---
+
+## Notes
+
+- Le token JWT est stocké dans `localStorage` après connexion.
+- Le front communique avec le backend via les URLs définies dans les hooks et pages.
+
+---
+
+Pour plus de détails, consulte les fichiers sources dans [`qlash-web`](qlash-web/).
